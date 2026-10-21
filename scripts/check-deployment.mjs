@@ -98,6 +98,22 @@ try {
 			JSON.parse(await page.locator('script[type="application/ld+json"]').textContent())['@type'],
 			'Article'
 		);
+		await expect(page.locator('meta[name="twitter:title"]')).toHaveAttribute(
+			'content',
+			'태양은 움직이는데, 왜 우리는 제자리에 있다고 느낄까? | A2O'
+		);
+		await page.evaluate(() => document.fonts.ready);
+		const preload = await page.locator('link[rel="preload"][as="font"]').getAttribute('href');
+		assert.match(preload, /A2OSans-Subset\.woff2\?v=[a-f0-9]{12}$/);
+		const requestedFonts = await page.evaluate(() => [
+			...new Set(
+				performance
+					.getEntriesByType('resource')
+					.map((entry) => entry.name)
+					.filter((url) => url.includes('A2OSans-Subset.woff2'))
+			)
+		]);
+		assert.deepEqual(requestedFonts, [new URL(preload, origin).href]);
 		await page.screenshot({ path: `${folder}/${width}-motion-article.png` });
 		const motionFigure = page.getByTestId('motion-frame-comparison');
 		const relativePosition = (await motionFigure.getAttribute('data-relative-position'))

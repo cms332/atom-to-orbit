@@ -34,4 +34,11 @@ style, count = re.subn(r"url\('/fonts/A2OSans-Subset\.woff2(?:\?v=[a-f0-9]+)?'\)
 if count != 1:
     raise RuntimeError('Expected one subset font URL in the stylesheet')
 stylesheet.write_text(style, encoding='utf-8')
+document = root / 'src/app.html'
+html = document.read_text(encoding='utf-8')
+html, count = re.subn(r'href="/fonts/A2OSans-Subset\.woff2(?:\?v=[a-f0-9]+)?"',
+                      f'href="/fonts/A2OSans-Subset.woff2?v={version}"', html)
+if count != 1:
+    raise RuntimeError('Expected one subset font preload in app.html')
+document.write_text(html, encoding='utf-8')
 print('Web subset:', font_path.stat().st_size, 'bytes; version:', version)

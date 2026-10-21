@@ -8,7 +8,12 @@ test('motion article is discoverable, sourced and has valid article metadata', a
 	page,
 	request
 }) => {
+	const fontRequests: string[] = [];
+	page.on('request', (request) => {
+		if (request.url().includes('A2OSans-Subset.woff2')) fontRequests.push(request.url());
+	});
 	await page.goto('/');
+	await page.evaluate(() => document.fonts.ready);
 	await page.locator('.article-card').getByRole('link', { name: title }).click();
 	await expect(page).toHaveURL(new RegExp(`${route}$`));
 	await expect(page.getByRole('heading', { level: 1 })).toHaveText(title);
@@ -24,6 +29,17 @@ test('motion article is discoverable, sourced and has valid article metadata', a
 	expect(schema.datePublished).toBe('2026-10-21');
 	expect(schema.mainEntityOfPage).toBe(`https://a2o.kr${route}`);
 	await expect(page.locator('meta[property="og:type"]')).toHaveAttribute('content', 'article');
+	await expect(page.locator('meta[name="twitter:title"]')).toHaveAttribute(
+		'content',
+		`${title} | A2O`
+	);
+	await expect(page.locator('meta[name="twitter:card"]')).toHaveAttribute(
+		'content',
+		'summary_large_image'
+	);
+	const fontPreload = (await page.locator('link[rel="preload"][as="font"]').getAttribute('href'))!;
+	expect(fontPreload).toMatch(/A2OSans-Subset\.woff2\?v=[a-f0-9]{12}$/);
+	expect([...new Set(fontRequests)]).toEqual([new URL(fontPreload, page.url()).href]);
 	for (const value of ['1,670', '29.78', '230'])
 		await expect(page.locator('.motion-speeds')).toContainText(value);
 	await expect(page.locator('.motion-speeds')).toContainText('적도 지표면');
