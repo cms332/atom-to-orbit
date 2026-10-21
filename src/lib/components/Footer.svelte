@@ -7,6 +7,13 @@
 	let footerNote: HTMLParagraphElement;
 	let noteBottom = $state(Infinity);
 	let pageHeight = $state(0);
+	let analyticsDisabled = $state(false);
+	function toggleAnalytics() {
+		analyticsDisabled = !analyticsDisabled;
+		if (analyticsDisabled) localStorage.setItem('umami.disabled', '1');
+		else localStorage.removeItem('umami.disabled');
+		location.reload();
+	}
 	const scrollRange = $derived(Math.max(0, pageHeight - viewportHeight));
 	const revealAt = $derived(
 		Math.min(Math.max(320, Math.min(640, viewportHeight * 0.75)), scrollRange / 2)
@@ -21,6 +28,11 @@
 	}
 
 	onMount(() => {
+		try {
+			analyticsDisabled = localStorage.getItem('umami.disabled') === '1';
+		} catch {
+			analyticsDisabled = true;
+		}
 		measureStop();
 		const observer = new ResizeObserver(measureStop);
 		observer.observe(document.body);
@@ -75,6 +87,19 @@
 		</a>
 		<div class="footer-bottom">
 			<span>© 2026 A2O — Atom to Orbit</span>
+			<details class="analytics-notice">
+				<summary>방문 통계 안내</summary>
+				<p>
+					사이트 개선을 위해 자체 서버에서 방문 경로·기기·국가와 탐험기 이용 통계를 수집합니다.
+					이름이나 이메일을 수집하거나 화면을 녹화하지 않습니다. 방문 기록은 180일, 백업은 14일
+					보관합니다.
+				</p>
+				<button type="button" onclick={toggleAnalytics}
+					>{analyticsDisabled
+						? '이 브라우저의 통계 수집 허용'
+						: '이 브라우저의 통계 수집 중지'}</button
+				>
+			</details>
 		</div>
 	</div>
 </footer>
@@ -165,6 +190,26 @@
 		font:
 			10px system-ui,
 			sans-serif;
+	}
+	.analytics-notice {
+		max-width: 440px;
+		font-size: 12px;
+		line-height: 1.7;
+	}
+	.analytics-notice summary {
+		cursor: pointer;
+		min-height: 44px;
+	}
+	.analytics-notice p {
+		margin: 0 0 12px;
+	}
+	.analytics-notice button {
+		color: var(--on-deep);
+		background: transparent;
+		border: 1px solid #6b878e;
+		border-radius: 4px;
+		min-height: 44px;
+		padding: 8px 12px;
 	}
 	@media (max-width: 767px) {
 		.footer-logo svg {

@@ -40,4 +40,4 @@ jobs:
       - name: Install test browser
         run: bunx playwright install --with-deps chromium
       - name: Article and navigation smoke tests
-        run: bun run test:e2e -- tests/site.spec.ts tests/motion-article.spec.ts tests/article-format.spec.ts
+        run: bun run test:e2e -- tests/site.spec.ts tests/motion-article.spec.ts tests/article-format.spec.ts tests/analytics.spec.ts
