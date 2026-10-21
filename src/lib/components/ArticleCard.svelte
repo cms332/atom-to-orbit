@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { Article } from '$lib/content/articles';
 	import Diagram from './Diagram.svelte';
+	import MotionThumbnail from './MotionThumbnail.svelte';
 	let { article, headingLevel = 3 }: { article: Article; headingLevel?: 2 | 3 } = $props();
 </script>
 
@@ -10,7 +11,8 @@
 		aria-labelledby={`article-title-${article.slug}`}
 		aria-describedby={`article-intro-${article.slug}`}
 		><div class="article-art">
-			{#if article.diagram === 'atom'}<Diagram kind="atom" />{:else}<svg
+			{#if article.diagram === 'motion'}<MotionThumbnail
+				/>{:else if article.diagram === 'atom'}<Diagram kind="atom" />{:else}<svg
 					viewBox="0 0 440 200"
 					role="img"
 					aria-label="지구와 달의 거리 비교를 위한 상징적 도식. 실제 크기 비례가 아님."

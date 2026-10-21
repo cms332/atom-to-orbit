@@ -510,11 +510,11 @@ test('topic links retain filters on reload and restore results through browser h
 	await page.reload();
 	await expect(page.locator('.article-card')).toHaveCount(1);
 	await filters.getByRole('link', { name: '전체', exact: true }).click();
-	await expect(page.locator('.article-card')).toHaveCount(2);
+	await expect(page.locator('.article-card')).toHaveCount(3);
 	await page.goBack();
 	await expect(page.getByRole('status')).toHaveText('미시 세계 이야기 · 1편');
 	await page.goForward();
-	await expect(page.getByRole('status')).toHaveText('전체 이야기 · 2편');
+	await expect(page.getByRole('status')).toHaveText('전체 이야기 · 3편');
 	await page.goto('/articles/?topic=unknown');
-	await expect(page.locator('.article-card')).toHaveCount(2);
+	await expect(page.locator('.article-card')).toHaveCount(3);
 });

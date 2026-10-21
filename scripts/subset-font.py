@@ -2,6 +2,8 @@
 Requires fonttools and brotli: python -m pip install fonttools brotli.
 """
 from pathlib import Path
+import hashlib
+import re
 from fontTools import subset
 from fontTools.ttLib import TTFont
 
@@ -23,4 +25,13 @@ for record in font['name'].names:
         record.string = value.encode(record.getEncoding())
 font.flavor = 'woff2'
 font.save(root / 'static/fonts/A2OSans-Subset.woff2')
-print('Web subset:', (root / 'static/fonts/A2OSans-Subset.woff2').stat().st_size, 'bytes')
+font_path = root / 'static/fonts/A2OSans-Subset.woff2'
+version = hashlib.sha256(font_path.read_bytes()).hexdigest()[:12]
+stylesheet = root / 'src/lib/styles.css'
+style = stylesheet.read_text(encoding='utf-8')
+style, count = re.subn(r"url\('/fonts/A2OSans-Subset\.woff2(?:\?v=[a-f0-9]+)?'\)",
+                       f"url('/fonts/A2OSans-Subset.woff2?v={version}')", style)
+if count != 1:
+    raise RuntimeError('Expected one subset font URL in the stylesheet')
+stylesheet.write_text(style, encoding='utf-8')
+print('Web subset:', font_path.stat().st_size, 'bytes; version:', version)

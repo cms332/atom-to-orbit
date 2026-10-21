@@ -16,6 +16,7 @@ for (const route of [
 	'/scale/',
 	'/orbit/',
 	'/articles/',
+	'/articles/why-earth-feels-still/',
 	'/robots.txt',
 	'/sitemap.xml',
 	'/fonts/OFL.txt',
@@ -85,6 +86,35 @@ try {
 				path: `${folder}/${width}-${route === '/' ? 'home' : route.replaceAll('/', '')}.png`
 			});
 		}
+		await page.goto(`${origin}/articles/why-earth-feels-still/`);
+		await expect(page.getByRole('heading', { level: 1 })).toHaveText(
+			'태양은 움직이는데, 왜 우리는 제자리에 있다고 느낄까?'
+		);
+		await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+			'href',
+			`${origin}/articles/why-earth-feels-still/`
+		);
+		assert.equal(
+			JSON.parse(await page.locator('script[type="application/ld+json"]').textContent())['@type'],
+			'Article'
+		);
+		await page.screenshot({ path: `${folder}/${width}-motion-article.png` });
+		const motionFigure = page.getByTestId('motion-frame-comparison');
+		const relativePosition = (await motionFigure.getAttribute('data-relative-position'))
+			.split(',')
+			.map(Number);
+		await motionFigure.getByRole('button', { name: '은하 기준', exact: true }).click();
+		await expect(motionFigure).toHaveAttribute('data-frame', 'galactic');
+		const changedPosition = (await motionFigure.getAttribute('data-relative-position'))
+			.split(',')
+			.map(Number);
+		for (let axis = 0; axis < 3; axis++)
+			assert.ok(Math.abs(relativePosition[axis] - changedPosition[axis]) < 1e-10);
+		await motionFigure.screenshot({ path: `${folder}/${width}-motion-galactic.png` });
+		await motionFigure.getByRole('button', { name: '태양 기준', exact: true }).click();
+		await expect(motionFigure).toHaveAttribute('data-frame', 'solar');
+		await expect(page.locator('.article-sources li')).toHaveCount(10);
+		await expect(page.locator('canvas')).toHaveCount(0);
 		await page.goto(`${origin}/orbit/`);
 		await expect(page.getByTestId('orbit-explorer')).toHaveAttribute('data-status', 'ready');
 		const canvas = page.getByTestId('orbit-canvas');

@@ -1,5 +1,6 @@
 import { additionalObjects, additionalSources } from './science-expansion';
 import { planetObjects, planetSources } from './science-planets';
+import { motionSources } from './motion';
 export type DimensionKind = 'diameter' | 'length' | 'height' | 'distance';
 export type ApproximationKind =
 	'approximate' | 'mean' | 'standard' | 'representative' | 'maximum' | 'nominal';
@@ -78,7 +79,8 @@ export const sources: ScienceSource[] = [
 		basis: '지구–달 평균 거리 384,400 km. 시간에 따라 달라지는 거리의 대표값입니다.'
 	},
 	...additionalSources,
-	...planetSources
+	...planetSources,
+	...motionSources
 ];
 export function sourceById(id: string): ScienceSource {
 	const source = sources.find((s) => s.id === id);

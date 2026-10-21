@@ -1,3 +1,5 @@
+import { motionArticle } from './motion-article';
+
 export interface Article {
 	slug: string;
 	title: string;
@@ -6,11 +8,22 @@ export interface Article {
 	intro: string;
 	date: string;
 	sourceIds: string[];
-	diagram: 'moon' | 'atom';
-	sections: { title: string; text: string }[];
+	diagram: 'moon' | 'atom' | 'motion';
+	readingMinutes?: number;
+	opening?: string[];
+	sourceNote?: string;
+	sections: {
+		title: string;
+		text: string;
+		paragraphs?: string[];
+		keyPoint?: string;
+		sourceIds?: string[];
+		visual?: 'inertia' | 'frames';
+	}[];
 	takeaway: string;
 }
 export const articles: Article[] = [
+	motionArticle,
 	{
 		slug: 'earth-moon',
 		title: '지구와 달은 얼마나 떨어져 있을까?',

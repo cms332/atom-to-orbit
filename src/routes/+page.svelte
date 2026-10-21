@@ -241,10 +241,13 @@
 	}
 	.article-grid {
 		display: grid;
-		grid-template-columns: repeat(2, minmax(0, 1fr));
+		grid-template-columns: repeat(3, minmax(0, 1fr));
 		gap: 38px;
 	}
 	@media (max-width: 1100px) {
+		.article-grid {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
 		.hero {
 			gap: 32px;
 			padding-block: 60px;
