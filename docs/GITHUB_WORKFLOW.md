@@ -1,9 +1,10 @@
 # GitHub 관리와 배포 기록
 
 작성일: 2026-10-21. 대상: [cms332/atom-to-orbit](https://github.com/cms332/atom-to-orbit).
-소유자가 검토 기록·파일 목록과 기존 이력 포함 공개를 승인했으며 빈 Public 저장소를
-생성했다. 기존 커밋과 배포 태그를 보존한다. CI·보호·배포의 실제 결과는 후속 기록으로
-구분하며 아래의 준비 명령만으로 완료를 주장하지 않는다.
+소유자가 검토 기록·파일 목록과 기존 이력 포함 공개를 승인했다. 원본 커밋 15개와
+태그 7개를 보존해 Push했으며, 새 소스 `d828cc2`는 GitHub CI 통과 후
+`20261021T065211Z`로 배포했다. 실제 결과는 [배포 기록](DEPLOYMENT.md)에 있다.
+아래의 준비 명령만으로 서명·보호·릴리스 발행 완료를 주장하지 않는다.
 
 ## 개발 → 검증 → GitHub → 별도 배포
 
@@ -81,7 +82,7 @@ GitHub Free에서도 브랜치 보호를 사용할 수 있다. 다음을 적용�
   과거 이력을 다시 만들게 하는 설정을 초기 업로드보다 먼저 적용하지 않는다.
 
 검토 가능한 API 본문은 `.github/main-protection.json`에 있다. CI의 실제 검사명이
-`verify`인지 확인한 뒤 `gh api --method PUT repos/cms332/atom-to-orbit/branches/main/protection --input .github/main-protection.json`으로 적용할 수 있다. 현재는 실행하지 않았다.
+`verify`인지 확인한 뒤 `gh api --method PUT repos/cms332/atom-to-orbit/branches/main/protection --input .github/main-protection.json`으로 적용하고, GET 응답과 기본 브랜치의 protected 상태로 확인한다. force push·삭제 금지, PR·CI 요구 및 관리자 포함이 설정 기준이다.
 
 GitHub에 설정하기 전에는 위 보호가 활성화됐다고 보고하지 않는다.
 [공식 브랜치 보호 문서](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches).
@@ -89,12 +90,14 @@ GitHub에 설정하기 전에는 위 보호가 활성화됐다고 보고하지 �
 ## 릴리스
 
 현재 패키지 버전은 `0.1.9`다. 제안된 `v0.1.0`을 자동으로 새 태그로 만들지 않는다.
-운영 소스는 기존 `deployed-20261021T050517Z` 태그의
-`0cc218289eb856587898db2bdd712f75c5368c75`이며, 미배포 로컬 수정과 구분한다.
-첫 GitHub Release는 이 기존 배포 태그를 사용하는 방안을 권장한다. 이름·태그·본문을
+최신 운영 소스는 `deployed-20261021T065211Z` 태그의
+`d828cc2792e2bec1dd6a31e2f82c67595b7e38c8`이다. 앞서 만든 로컬 릴리스 초안은
+이전 `deployed-20261021T050517Z`를 설명한다. GitHub Release 이름·태그·본문을
 소유자가 검토한 뒤 게시한다. GitHub 게시 시각과 실제 서버 배포 시각은 다르다.
 
 Immutable Releases는 저장소 Settings → General → Releases에서 활성화할 수 있다.
+실제 저장소에서 API로 활성화하고 `enabled: true`를 확인했다. 아직 Release를
+발행한 것은 아니며 기존 태그를 이동하거나 변경하지 않았다.
 활성화 이후 게시된 릴리스의 태그·첨부 파일 변경이 제한되므로 초안을 먼저 준비하고
 자산·해시·태그를 검증한 후 게시한다. 설정이 과거 커밋 시각을 증명하거나 과거
 커밋을 서명한 것으로 바꾸지는 않는다.
