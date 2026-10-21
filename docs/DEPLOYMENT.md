@@ -117,3 +117,30 @@ NPM 내부 모듈 API는 현재 설치 버전에서 검증한다. NPM 업그레�
 - 증거: `artifacts/github-publication/source-ci.json`, `github-deployment.json`,
   `public-20261021T065211Z/verification.json`, `build-info.json`과 실제 PC/모바일 화면.
   서버 비공개 감사 원본이나 자격 증명은 저장소에 올리지 않는다.
+
+## 지구 근접 화면 유령선·푸터 안내 정리 배포 — 2026-10-21
+
+- 소유자가 로컬 결과를 검토하고 배포를 명시적으로 승인했다.
+  [PR #5](https://github.com/cms332/atom-to-orbit/pull/5)를 필수 CI 통과 후 main에 병합했다.
+- 실제 배포 소스: `f0cc70bf6e7e92d97970735a1dd84bd6abc704d4`.
+  [해당 커밋 CI](https://github.com/cms332/atom-to-orbit/actions/runs/39590148922)에서
+  타입·린트·단위 테스트 51개·정적 빌드·PC/모바일 브라우저 검사 52개가 통과한 뒤 배포했다.
+- 릴리스 `20261021T111559Z`, 직전 정상 릴리스 `20261021T094656Z`.
+  소스 패키지 SHA-256: `8972495afecebe141068fb53698a8333e43ab78e1cc8c9527e8e72d673adf470`.
+  실제 빌드 시각: `2026-10-21T11:16:33.732Z` (KST 20:16:33).
+  공개 `/build-info.json`의 commit·release·sourceSha256이 실제 패키지와 일치한다.
+- 6장의 실물 비례 지구 근접 화면에서 유령선처럼 교차하던 지구 공전 보조선만 생략했다.
+  지구 크기·기존 구도·실제 이동 자취와 다른 행성의 경로를 유지한다. 일반 보기와 ‘가까이 보기’에서는
+  지구 공전 보조선이 복구된다. 요청하지 않은 푸터 ‘방문 통계 안내’와 버튼을 제거했다.
+- Linux 타입 검사·51개 단위 테스트·빌드·새 컨테이너 healthcheck와 전용 A2O 전환이 통과했다.
+  다른 컨테이너 26개와 프록시 설정 6개의 상태/해시가 유지됐다. DNS, HGI와 공용 Umami/DB 설정은
+  변경하지 않았다.
+- 실제 공개 PC 1440×1000 / 모바일 360×800 검사에서 HTTP 경로 9개, 기사·도식·탐험기·설정,
+  푸터 안내 부재와 6장 자취의 이동·현재 위치 연결·다른 보기에서 기준선 복구가 통과했다.
+  페이지 오류·실패한 자원 요청 0개이며 실제 공개 화면도 확인했다. 모바일은 Chromium 터치 에뮬레이션이다.
+  이전 JavaScript 자원 29개가 정상 응답하고 네이버 소유 확인 파일은 원본과 동일하다.
+- 배포 태그 `deployed-20261021T111559Z`는 위 실제 소스를 가리킨다.
+  GitHub production Deployment `7224646939`에 해당 CI·릴리스·해시와 검증 후 success를 기록했다.
+  이 결과를 정리한 후속 문서 커밋은 배포 소스로 소급하지 않는다.
+- 증거: `artifacts/finale-footer-deployment/`의 `source-ci.json`, `metadata-and-assets.json`,
+  `github-deployment-success.json`, `public-20261021T111559Z/verification.json` 및 실제 PC/모바일 캡처.
