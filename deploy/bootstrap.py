@@ -5,7 +5,6 @@ import os
 from pathlib import Path
 import re
 import shutil
-import sqlite3
 import subprocess
 import sys
 
@@ -28,26 +27,43 @@ def snapshot():
     services = {c['Name'].lstrip('/'): {'id': c['Id'], 'started': c['State']['StartedAt'],
                 'restarts': c['RestartCount'], 'running': c['State']['Running']}
                 for c in containers if not c['Name'].lstrip('/').startswith('a2o-')}
-    npm = next(c for c in containers if c['Name'] == '/npm')
-    data = Path(next(m['Source'] for m in npm['Mounts'] if m['Destination'] == '/data'))
-    configs = {}
-    for p in (data / 'nginx' / 'proxy_host').glob('*.conf'):
-        content = p.read_bytes()
-        if re.search(rb'^\s*server_name\b[^\n;]*\ba2o\.kr\b', content, re.M):
-            continue
-        configs[p.name] = hashlib.sha256(content).hexdigest()
-    return {'services': services, 'configs': configs}, data
+    config_reader = r'''
+import {readdir,readFile} from 'node:fs/promises';
+import {createHash} from 'node:crypto';
+const result={};
+for(const file of (await readdir('/data/nginx/proxy_host')).sort()) {
+ if(!/^\d+\.conf$/.test(file)) continue;
+ const bytes=await readFile(`/data/nginx/proxy_host/${file}`);
+ if(/^\s*server_name\b[^\n;]*\ba2o\.kr\b/m.test(bytes.toString())) continue;
+ result[file]=createHash('sha256').update(bytes).digest('hex');
+}
+console.log(JSON.stringify(result));
+'''
+    configs = json.loads(subprocess.check_output(
+        ['docker', 'exec', '-i', 'npm', 'node', '--input-type=module'],
+        input=config_reader, text=True))
+    return {'services': services, 'configs': configs}
 
 
 audit = STATE / f'audit-{release}-before.json'
 if action == 'prepare':
-    baseline, data = snapshot()
+    baseline = snapshot()
     audit.write_text(json.dumps(baseline, indent=2) + '\n')
     backup = STATE / 'npm-before-a2o.sqlite'
     if not backup.exists():
-        with sqlite3.connect(f'file:{data / "database.sqlite"}?mode=ro', uri=True) as source:
-            with sqlite3.connect(backup) as destination:
-                source.backup(destination)
+        backup_script = '''
+import os,sqlite3,sys
+from pathlib import Path
+os.umask(0o077)
+path=Path('/tmp/a2o-before-initial.sqlite')
+with sqlite3.connect('file:/data/database.sqlite?mode=ro',uri=True) as source:
+ with sqlite3.connect(path) as destination:
+  source.backup(destination)
+sys.stdout.buffer.write(path.read_bytes())
+path.unlink()
+'''
+        backup.write_bytes(subprocess.check_output(
+            ['docker', 'exec', '-i', 'npm', 'python3', '-'], input=backup_script.encode()))
     networks = command('docker', 'network', 'ls', '--format', '{{.Name}}').split()
     if 'a2o-web' not in networks:
         command('docker', 'network', 'create', 'a2o-web')
@@ -80,7 +96,7 @@ if action == 'prepare':
     print('A2O network prepared; existing stack was not restarted')
 elif action == 'verify':
     before = json.loads(audit.read_text())
-    after, _ = snapshot()
+    after = snapshot()
     for name, state in before['services'].items():
         if after['services'].get(name) != state:
             raise SystemExit(f'Existing service state changed: {name}')
