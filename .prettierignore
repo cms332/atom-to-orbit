@@ -14,3 +14,5 @@ docs/reference-assets/
 docs/content/why-earth-feels-still/reference/
 static/fonts/OFL.txt
 static/licenses/
+# Preserve the owner-supplied Naver verification file byte-for-byte.
+static/navere7e94d90ff34befe728fcf0aaa8edefd.html
