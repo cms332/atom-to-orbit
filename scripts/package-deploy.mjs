@@ -18,6 +18,7 @@ for (const file of [
 	'static',
 	'deploy',
 	'scripts/prepare-release.mjs',
+	'docs/scale-illustration-references.json',
 	'package.json',
 	'bun.lock',
 	'svelte.config.js',
