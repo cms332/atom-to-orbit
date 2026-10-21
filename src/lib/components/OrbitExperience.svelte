@@ -141,6 +141,13 @@
 		selected = id;
 		controller?.focus(id);
 	}
+	function chooseFromSettings(id: string) {
+		choosePlanet(id);
+		if (matchMedia('(max-width: 767px)').matches) {
+			settings = false;
+			settingsButton?.focus({ preventScroll: true });
+		}
+	}
 	function seek(value: number) {
 		manual();
 		years = value;
@@ -310,7 +317,7 @@
 			<label for="planet-select">가까이 보기</label><select
 				id="planet-select"
 				value={following ? selected : ''}
-				onchange={(e) => choosePlanet(e.currentTarget.value)}
+				onchange={(e) => chooseFromSettings(e.currentTarget.value)}
 				><option value="" disabled>천체 선택</option><option value="sun">태양</option
 				>{#each orbitPlanets as p (p.id)}<option value={p.id}>{p.name}</option>{/each}</select
 			>

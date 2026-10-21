@@ -272,7 +272,7 @@ test('continuous motion, three-button dock and inner-planet solar entry survive 
 	await expect(canvas).toHaveAttribute('data-focus', 'earth');
 	await expect(canvas).toHaveAttribute('data-preset', 'track-earth');
 	await expect(canvas).toHaveAttribute('data-transitioning', 'false', { timeout: 5000 });
-	await page.getByRole('button', { name: '설정 닫기', exact: true }).click();
+	if (!isMobile) await page.getByRole('button', { name: '설정 닫기', exact: true }).click();
 	await page.screenshot({ path: `artifacts/orbit-continuous/${info.project.name}-earth.png` });
 	await page.getByRole('button', { name: '태양계', exact: true }).click();
 	await expect(canvas).toHaveAttribute('data-transitioning', 'false', { timeout: 5000 });
@@ -326,16 +326,27 @@ test('settings dismiss outside with mouse or touch while panel controls and the 
 	for (const id of ['earth', 'saturn']) {
 		await target.focus();
 		await target.selectOption(id);
-		await expect(target).toHaveValue(id);
-		await expect(target).toBeFocused();
-		await expect(panel).toBeVisible();
-		await expect(trigger).toHaveAttribute('aria-expanded', 'true');
+		if (isMobile) {
+			await expect(panel).toHaveCount(0);
+			await expect(trigger).toHaveAttribute('aria-expanded', 'false');
+			await expect(trigger).toBeFocused();
+		} else {
+			await expect(target).toHaveValue(id);
+			await expect(target).toBeFocused();
+			await expect(panel).toBeVisible();
+			await expect(trigger).toHaveAttribute('aria-expanded', 'true');
+		}
 		await expect(page.getByTestId('orbit-canvas')).toHaveAttribute('data-preset', `track-${id}`);
 		await expect(page.getByTestId('orbit-canvas')).toHaveAttribute('data-transitioning', 'false');
+		if (id === 'saturn')
+			await page.screenshot({
+				path: `artifacts/orbit-settings-responsive/${info.project.name}-saturn.png`
+			});
+		if (isMobile) {
+			await trigger.click();
+			await expect(target).toHaveValue(id);
+		}
 	}
-	await page.screenshot({
-		path: `artifacts/orbit-settings-selection/${info.project.name}-saturn-settings-open.png`
-	});
 	const canvas = (await page.getByTestId('orbit-canvas').boundingBox())!;
 	const outside = { x: canvas.x + 8, y: canvas.y + 120 };
 	// A gesture beginning on a slider remains an in-panel interaction even if it ends outside.
@@ -1143,7 +1154,8 @@ test('picking a celestial body pauses and retains its story chapter', async ({
 });
 
 test('target tracking keeps every body and path while the selected body stays fixed and spins', async ({
-	page
+	page,
+	isMobile
 }, info) => {
 	test.setTimeout(120000);
 	await page.emulateMedia({ reducedMotion: 'reduce' });
@@ -1176,6 +1188,8 @@ test('target tracking keeps every body and path while the selected body stays fi
 		'uranus',
 		'neptune'
 	]) {
+		if (isMobile && id !== 'sun')
+			await page.getByRole('button', { name: '설정', exact: true }).click();
 		const select = page.getByLabel('가까이 보기', { exact: true });
 		if (id === 'sun') await expect(select).toHaveValue('');
 		await select.focus();
@@ -1184,7 +1198,9 @@ test('target tracking keeps every body and path while the selected body stays fi
 			'inset'
 		);
 		await select.selectOption(id);
-		await expect(page.getByRole('complementary', { name: '탐험 설정', exact: true })).toBeVisible();
+		const settings = page.getByRole('complementary', { name: '탐험 설정', exact: true });
+		if (isMobile) await expect(settings).toHaveCount(0);
+		else await expect(settings).toBeVisible();
 		await expect(canvas).toHaveAttribute('data-preset', `track-${id}`);
 		await expect(canvas).toHaveAttribute('data-transitioning', 'false');
 		await expect(canvas).toHaveAttribute('data-sun-visible', 'true');
@@ -1219,6 +1235,7 @@ test('target tracking keeps every body and path while the selected body stays fi
 				path: `artifacts/orbit-target-tracking/${info.project.name}-${id}.png`
 			});
 	}
+	if (isMobile) await page.getByRole('button', { name: '설정', exact: true }).click();
 	await page.getByLabel('가까이 보기', { exact: true }).selectOption('earth');
 	await page.setViewportSize({ width: 320, height: 844 });
 	await expect(canvas).toHaveAttribute('data-transitioning', 'false');
@@ -1229,7 +1246,7 @@ test('target tracking keeps every body and path while the selected body stays fi
 	expect(narrow.screen[0]).toBeCloseTo(160, 1);
 	expect(narrow.screen[2]).toBeGreaterThan(30);
 	expect(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth)).toBe(false);
-	await page.getByRole('button', { name: '설정 닫기', exact: true }).click();
+	if (!isMobile) await page.getByRole('button', { name: '설정 닫기', exact: true }).click();
 	await page.getByRole('button', { name: '태양계', exact: true }).click();
 	await expect(canvas).toHaveAttribute('data-focus', '');
 	await page.getByRole('button', { name: '설정', exact: true }).click();

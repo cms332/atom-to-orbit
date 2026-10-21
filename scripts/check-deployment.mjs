@@ -93,6 +93,22 @@ try {
 			.poll(async () => Number(await canvas.getAttribute('data-year')))
 			.toBeGreaterThan(time);
 		await page.screenshot({ path: `${folder}/${width}-orbit.png` });
+		const settings = page.getByRole('complementary', { name: '탐험 설정', exact: true });
+		const settingsButton = page.getByRole('button', { name: '설정', exact: true });
+		await settingsButton.click();
+		await page.getByLabel('시간 배속', { exact: true }).selectOption('0.1');
+		await expect(settings).toBeVisible();
+		await page.getByLabel('가까이 보기', { exact: true }).selectOption('earth');
+		if (width < 768) {
+			await expect(settings).toHaveCount(0);
+			await expect(settingsButton).toBeFocused();
+		} else await expect(settings).toBeVisible();
+		await expect(canvas).toHaveAttribute('data-preset', 'track-earth');
+		await expect(canvas).toHaveAttribute('data-transitioning', 'false');
+		await page.screenshot({ path: `${folder}/${width}-settings-selection.png` });
+		if (width < 768) await settingsButton.click();
+		await expect(page.getByLabel('가까이 보기', { exact: true })).toHaveValue('earth');
+		await page.getByRole('button', { name: '설정 닫기', exact: true }).click();
 		const story = page.getByRole('button', { name: '스토리', exact: true });
 		await story.click();
 		await story.click();
