@@ -143,6 +143,84 @@ test('article stays readable at narrow widths and enlarged text', async ({ page 
 	await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
 });
 
+test('both frames play, pause in place, resume, scrub and restart after completion', async ({
+	page
+}, info) => {
+	const errors: string[] = [];
+	page.on('pageerror', (error) => errors.push(error.message));
+	await page.clock.install({ time: new Date('2026-10-21T00:00:00Z') });
+	await page.goto(route);
+	await page.clock.pauseAt(new Date('2026-10-21T00:01:00Z'));
+	const figure = page.getByTestId('motion-frame-comparison');
+	const playback = figure.getByTestId('motion-playback');
+	const slider = figure.getByRole('slider');
+	const phase = async () => Number(await figure.getAttribute('data-phase'));
+	await expect(figure).toHaveAttribute('data-playing', 'false');
+	await page.clock.runFor(1000);
+	expect(await phase()).toBe(1);
+	for (const [frame, other, reducedMotion] of [
+		['태양', '은하', 'no-preference'],
+		['은하', '태양', 'reduce']
+	] as const) {
+		await page.emulateMedia({ reducedMotion });
+		await figure.getByRole('button', { name: `${frame} 기준`, exact: true }).click();
+		await expect(playback).toHaveAccessibleName(`${frame} 기준 재생하기`);
+		await playback.focus();
+		await playback.press('Enter');
+		await expect(playback).toHaveAccessibleName(`${frame} 기준 일시 정지`);
+		await expect(playback).toHaveAttribute('aria-pressed', 'true');
+		await expect(playback.locator('svg path')).toHaveCount(1);
+		expect(await phase()).toBe(0);
+		await page.clock.runFor(1200);
+		const progressed = await phase();
+		expect(progressed).toBeGreaterThan(0.05);
+		expect(progressed).toBeLessThan(0.15);
+		await playback.click();
+		const paused = await phase();
+		await expect(playback.locator('svg polygon')).toHaveCount(1);
+		await page.clock.runFor(1200);
+		expect(await phase()).toBe(paused);
+		await playback.focus();
+		await playback.press('Space');
+		await page.clock.runFor(600);
+		expect(await phase()).toBeGreaterThan(paused);
+		const beforeSwitch = await phase();
+		await figure.getByRole('button', { name: `${other} 기준`, exact: true }).click();
+		expect(await phase()).toBe(beforeSwitch);
+		await expect(figure).toHaveAttribute('data-playing', 'true');
+		await figure.getByRole('button', { name: `${frame} 기준`, exact: true }).click();
+		await slider.fill('0.42');
+		await expect(figure).toHaveAttribute('data-playing', 'false');
+		await page.clock.runFor(500);
+		expect(await phase()).toBe(0.42);
+		await playback.click();
+		await page.clock.runFor(120);
+		await figure.screenshot({
+			path: `artifacts/motion-playback/${info.project.name}-${frame}-playing.png`
+		});
+		await playback.press('Escape');
+		const escaped = await phase();
+		await page.clock.runFor(500);
+		expect(await phase()).toBe(escaped);
+		await playback.click();
+		await page.clock.fastForward(20_000);
+		await expect(figure).toHaveAttribute('data-phase', '1');
+		await expect(figure).toHaveAttribute('data-playing', 'false');
+		await expect(playback).toHaveAccessibleName(`${frame} 기준 재생하기`);
+		await playback.click();
+		expect(await phase()).toBe(0);
+		await playback.click();
+		await slider.fill('1');
+	}
+	await playback.click();
+	await page.goto('/articles/');
+	await page.clock.runFor(1200);
+	await page.goto(route);
+	await expect(figure).toHaveAttribute('data-playing', 'false');
+	await expect(figure).toHaveAttribute('data-phase', '1');
+	expect(errors).toEqual([]);
+});
+
 test('article and both frame diagrams remain available without JavaScript', async ({
 	browser
 }, info) => {

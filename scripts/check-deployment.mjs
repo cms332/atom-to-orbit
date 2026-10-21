@@ -141,6 +141,27 @@ try {
 		await motionFigure.getByRole('button', { name: '태양 기준', exact: true }).click();
 		await expect(motionFigure).toHaveAttribute('data-frame', 'solar');
 		await expect(motionFigure.locator('.frame-summary')).toContainText('태양 고정');
+		const playback = motionFigure.getByTestId('motion-playback');
+		for (const frame of ['태양', '은하']) {
+			await motionFigure.getByRole('button', { name: `${frame} 기준`, exact: true }).click();
+			await playback.click();
+			await expect(playback).toHaveAccessibleName(`${frame} 기준 일시 정지`);
+			await expect
+				.poll(async () => Number(await motionFigure.getAttribute('data-phase')))
+				.toBeGreaterThan(0.02);
+			await motionFigure.screenshot({ path: `${folder}/${width}-motion-${frame}-playing.png` });
+			await playback.click();
+			const pausedPhase = await motionFigure.getAttribute('data-phase');
+			await expect(playback).toHaveAccessibleName(`${frame} 기준 재생하기`);
+			await motionFigure.screenshot({ path: `${folder}/${width}-motion-${frame}-paused.png` });
+			assert.equal(await motionFigure.getAttribute('data-phase'), pausedPhase);
+			await playback.click();
+			await expect
+				.poll(async () => Number(await motionFigure.getAttribute('data-phase')))
+				.toBeGreaterThan(Number(pausedPhase) + 0.01);
+			await motionFigure.getByRole('slider').fill('1');
+			await expect(motionFigure).toHaveAttribute('data-playing', 'false');
+		}
 		await expect(page.locator('.article-sources li')).toHaveCount(10);
 		await expect(page.locator('canvas')).toHaveCount(0);
 		await page.goto(`${origin}/orbit/`);

@@ -5,10 +5,48 @@
 	let frame = $state<OrbitFrame>('solar');
 	let phase = $state(1);
 	let mounted = $state(false);
+	let playing = $state(false);
+	let animationFrame = 0;
 	const uid = $props.id();
 	const scene = $derived(motionScene(frame, phase));
+	function pausePlayback() {
+		cancelAnimationFrame(animationFrame);
+		playing = false;
+	}
+	function togglePlayback() {
+		if (playing) {
+			pausePlayback();
+			return;
+		}
+		if (phase >= 1) phase = 0;
+		const from = phase;
+		const started = performance.now();
+		// Explicit playback follows the same path more slowly when motion reduction is requested.
+		const duration = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+			? 18_000
+			: 12_000;
+		playing = true;
+		function tick(now: number) {
+			if (!playing) return;
+			phase = Math.min(1, from + (now - started) / duration);
+			if (phase >= 1) pausePlayback();
+			else animationFrame = requestAnimationFrame(tick);
+		}
+		animationFrame = requestAnimationFrame(tick);
+	}
 	onMount(() => {
 		mounted = true;
+		const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
+		const visibilityChanged = () => {
+			if (document.hidden) pausePlayback();
+		};
+		document.addEventListener('visibilitychange', visibilityChanged);
+		motion.addEventListener('change', pausePlayback);
+		return () => {
+			cancelAnimationFrame(animationFrame);
+			document.removeEventListener('visibilitychange', visibilityChanged);
+			motion.removeEventListener('change', pausePlayback);
+		};
 	});
 </script>
 
@@ -82,6 +120,7 @@
 	data-testid="motion-frame-comparison"
 	data-frame={frame}
 	data-phase={phase}
+	data-playing={playing}
 	data-relative-position={scene.current.earth.map((v, i) => v - scene.current.sun[i]).join(',')}
 >
 	<div class="figure-heading">
@@ -113,7 +152,28 @@
 				: '태양의 이동이 더해져 지구의 지나온 길이 열립니다.'}</span
 		>
 	</p>
-	<div class="drawing">{@render drawing(frame, phase)}</div>
+	<button
+		type="button"
+		class="playback-button"
+		data-testid="motion-playback"
+		disabled={!mounted}
+		aria-label={`${frame === 'solar' ? '태양' : '은하'} 기준 ${playing ? '일시 정지' : '재생하기'}`}
+		aria-pressed={playing}
+		aria-controls={`${uid}-drawing ${uid}-time`}
+		onclick={togglePlayback}
+		onkeydown={(event) => {
+			if (event.key === 'Escape') pausePlayback();
+		}}
+	>
+		<svg class="playback-icon" viewBox="0 0 12 12" aria-hidden="true">
+			{#if playing}<path d="M3 2v8M9 2v8" stroke="currentColor" stroke-width="2" />{:else}<polygon
+					points="3,2 10,6 3,10"
+					fill="currentColor"
+				/>{/if}
+		</svg>
+		{playing ? '일시 정지' : '재생하기'}
+	</button>
+	<div class="drawing" id={`${uid}-drawing`}>{@render drawing(frame, phase)}</div>
 	<div class="legend" aria-label="도식 범례">
 		<span><i class="earth"></i>지구와 지나온 길</span><span><i class="sun"></i>태양</span><span
 			><i class="start"></i>출발 위치</span
@@ -122,7 +182,7 @@
 	</div>
 	<div class="time-control">
 		<label for={`${uid}-time`}>같은 1년을 따라가기</label>
-		<output for={`${uid}-time`}>{Math.round(phase * 100)}%</output>
+		<output for={`${uid}-time`} aria-live="off">{Math.round(phase * 100)}%</output>
 		<input
 			id={`${uid}-time`}
 			aria-valuetext={`한 바퀴의 ${Math.round(phase * 100)}%`}
@@ -133,6 +193,7 @@
 			value={phase}
 			disabled={!mounted}
 			oninput={(event) => {
+				pausePlayback();
 				phase = Number(event.currentTarget.value);
 			}}
 		/>
@@ -188,6 +249,18 @@
 	}
 	button:disabled {
 		cursor: default;
+	}
+	.playback-button {
+		display: inline-flex;
+		align-items: center;
+		gap: 9px;
+		margin-top: 16px;
+		min-width: 128px;
+	}
+	.playback-icon {
+		width: 14px;
+		height: 14px;
+		flex: none;
 	}
 	.drawing {
 		margin-top: 16px;
