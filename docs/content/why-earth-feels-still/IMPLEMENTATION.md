@@ -45,4 +45,12 @@
 - PC 1440px / 모바일 390px Chromium 검사 **14 passed / 0 failed / 0 flaky** (36.4초). 새 기사·메타데이터·출처·홈/필터·키보드·기준계 불변성·모션 줄이기·320/768px·실제 계산 글자 크기 200%·JavaScript 비활성 두 도식과 기존 대표 페이지 접근성을 검증했다. 실제 물리 기기 성능을 검증했다는 뜻은 아니다.
 - 실제 화면을 직접 확인했다. 보고서와 캡처는 `artifacts/motion-article/`에 있다: `local-results.json`, `desktop/mobile-opening.png`, `desktop/mobile-speeds.png`, `desktop/mobile-train.png`, `desktop/mobile-solar.png`, `desktop/mobile-galactic.png`, `desktop/mobile-home-stories.png` 및 전체 기사 캡처. 재현용 `capture.mjs`도 보관한다.
 
-공개 게시 결과는 실제 배포 후 진행 문서에 별도로 기록한다. DNS와 다른 서비스 설정은 콘텐츠 작업 범위에 포함하지 않는다.
+## 공개 게시
+
+현재 소유자의 “컨텐츠 올려줘” 요청을 공개 게시 요청으로 해석한다고 진행 중에 명시하고, 검증한 소스를 기존 A2O 전용 배포로 게시했다. 원문 패키지의 로컬 전용 기본 요청문은 수정하지 않았다.
+
+- 공개 주소: `https://a2o.kr/articles/why-earth-feels-still/`.
+- 릴리스: `20261021T035437Z`, 실제 소스 커밋 `1d61194e480acc4320006ec3bda7a2d4c2ba9bf0`, 직전 정상 릴리스 `20261021T023538Z`.
+- Linux 타입 검사·49개 단위 테스트·빌드·버전/자원 확인을 통과했다. 기존 컨테이너 24개와 다른 서비스의 프록시 설정 6개가 그대로임을 감사했다. DNS와 기존 HGI 설정은 변경하지 않았다.
+- 공개 PC 1440×1000 / 모바일 360×800에서 새 기사 제목·canonical·Article JSON-LD·출처 10개·두 기준계의 전환과 상대 위치 유지, 별도 canvas 부재를 확인했다. 기존 탐험기 및 모바일 설정 동작도 정상이며 페이지 오류·자원 요청 실패가 없다. 총 9개 HTTP 경로 검사와 실제 사이트맵 7개 페이지, 이전 자산 30개, 125,772바이트의 새 폰트와 OFL 링크가 정상이다.
+- 공개 증거: `artifacts/motion-article/public-verification.json`, `public-release.json`, `public-desktop/mobile-opening.png`, `public-desktop/mobile-galactic.png`. 실제 공개 모바일 캡처도 직접 확인했다.

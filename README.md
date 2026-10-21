@@ -32,8 +32,9 @@ bun run preview --port 4173
 - `/`: Editorial Observatory 홈과 실제 로그 탐색 미리보기
 - `/scale/`: 27개 대상, 네이티브 슬라이더, 직접 선택 목록, 정적 데이터 표
 - `/orbit/`: 태양과 8행성의 3D 공전·은하 이동, 좌표계 비교와 한국어 이야기
-- `/articles/`: 실제 원고 두 편과 동작하는 주제 필터
-- `/articles/earth-moon/`, `/articles/atomic-scale/`: 출처가 연결된 로컬 초판
+- `/articles/`: 실제 원고 세 편과 동작하는 주제 필터
+- `/articles/why-earth-feels-still/`: 움직임을 체감하지 못하는 이유, 속도·관성 도식과 기준계 비교
+- `/articles/earth-moon/`, `/articles/atomic-scale/`: 출처가 연결된 첫 두 기사
 - `/404/`: 오류 안내
 - `/sitemap.xml`, `/robots.txt`: 정적 검색 메타데이터
 
@@ -43,8 +44,8 @@ bun run preview --port 4173
 
 - 과학 수치와 출처: `src/lib/data/science.ts`. 항상 SI 미터로 저장하고 측정 방식과 환산식을 명시합니다. 거리와 물체 지름을 혼합하지 않습니다.
 - 로그 좌표·단위: `src/lib/utils/scales.ts`. 범위는 10⁻¹⁰ m부터 태양의 지름 1,391,400,000 m까지이며, 눈금의 수평 위치는 `(log10(m) + 10) / (log10(MAX_METERS) + 10)`입니다. 오른쪽 끝에서 태양의 원자료 치수에 정확히 도달합니다.
-- 원고: `src/lib/content/articles.ts`. 타입이 있는 콘텐츠 배열로 불필요한 Markdown 런타임을 피하고 출처 ID와 연결했습니다. 원고 추가 시 실제 날짜, 출처와 경로를 함께 등록합니다.
-- 문구 변경 후 웹폰트 재생성: `python -m pip install fonttools brotli`, `python scripts/subset-font.py`. 원본은 `scripts/fonts/`, 현재 문구로 만든 웹 서브셋은 `static/fonts/`에 있습니다. OFL과 Reserved Font Name에 맞춰 파생 폰트의 내부 이름을 `A2O Sans Subset`으로 변경했습니다.
+- 원고: `src/lib/content/articles.ts`와 `motion-article.ts`. 타입이 있는 콘텐츠 배열로 불필요한 Markdown 런타임을 피하고 출처 ID와 연결했습니다. 원고 추가 시 실제 날짜, 출처와 경로를 함께 등록합니다. 움직임 기사의 SI 속도와 원출처는 `src/lib/data/motion.ts`에 있습니다.
+- 문구 변경 후 웹폰트 재생성: `python -m pip install fonttools brotli`, `python scripts/subset-font.py`. 원본은 `scripts/fonts/`, 현재 문구로 만든 웹 서브셋은 `static/fonts/`에 있습니다. OFL과 Reserved Font Name에 맞춰 파생 폰트의 내부 이름을 `A2O Sans Subset`으로 변경했습니다. 스크립트가 CSS 폰트 URL의 내용 해시도 갱신하므로 둘을 함께 커밋합니다.
 - 공유 이미지 재생성: `node scripts/render-social.mjs`. 기존 HTML 참고 화면 캡처도 `artifacts/reference-desktop.png`에 저장합니다.
 - CSS는 페이지별 작은 스타일을 프리렌더 HTML에 인라인합니다. 루트 도메인에서 서비스하는 구조이므로 ESLint의 base-path `resolve()` 강제 규칙만 제외했습니다.
 - 정적 호스팅 시 알 수 없는 경로에 `404.html`을 **404 상태 코드로** 반환해야 합니다. 현재 Ubuntu Nginx 설정과 공개 응답에서 이를 검증했습니다.
