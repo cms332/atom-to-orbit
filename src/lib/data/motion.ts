@@ -61,7 +61,7 @@ export const motionSources: ScienceSource[] = [
 		url: 'https://nssdc.gsfc.nasa.gov/planetary/factsheet/earthfact.html',
 		accessedAt: '2026-10-21',
 		basis:
-			'태양 중심 평균 공전 속도 29.78 km/s. 최솟값 29.29 km/s, 최댓값 30.29 km/s로 타원 궤도에서 변합니다.'
+			'태양 중심 평균 공전 속도 29.78 km/s. 최솟값 29.29 km/s, 최댓값 30.29 km/s로 타원 궤도에서 변합니다. 체적 평균 반지름 6,371km의 두 배인 평균 지름 12,742km를 거리 비교에 사용합니다.'
 	},
 	{
 		id: 'motion-galaxy',

@@ -94,6 +94,15 @@ try {
 			'href',
 			`${origin}/articles/why-earth-feels-still/`
 		);
+		await expect(page.locator('meta[property="og:title"]')).toHaveAttribute(
+			'content',
+			'태양은 움직이는데, 왜 우리는 제자리에 있다고 느낄까? | A2O'
+		);
+		await expect(page.locator('meta[property="og:image"]')).toHaveAttribute(
+			'content',
+			'https://a2o.kr/og-default.png'
+		);
+		await expect(page.locator('#question-4 + p')).toContainText('지구 평균 지름의 약 18%');
 		assert.equal(
 			JSON.parse(await page.locator('script[type="application/ld+json"]').textContent())['@type'],
 			'Article'
@@ -121,6 +130,8 @@ try {
 			.map(Number);
 		await motionFigure.getByRole('button', { name: '은하 기준', exact: true }).click();
 		await expect(motionFigure).toHaveAttribute('data-frame', 'galactic');
+		await expect(motionFigure.locator('.frame-summary')).toContainText('태양도 이동');
+		await expect(motionFigure.locator('.legend')).toContainText('태양의 이동 경로');
 		const changedPosition = (await motionFigure.getAttribute('data-relative-position'))
 			.split(',')
 			.map(Number);
@@ -129,6 +140,7 @@ try {
 		await motionFigure.screenshot({ path: `${folder}/${width}-motion-galactic.png` });
 		await motionFigure.getByRole('button', { name: '태양 기준', exact: true }).click();
 		await expect(motionFigure).toHaveAttribute('data-frame', 'solar');
+		await expect(motionFigure.locator('.frame-summary')).toContainText('태양 고정');
 		await expect(page.locator('.article-sources li')).toHaveCount(10);
 		await expect(page.locator('canvas')).toHaveCount(0);
 		await page.goto(`${origin}/orbit/`);

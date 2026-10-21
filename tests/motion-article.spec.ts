@@ -29,6 +29,16 @@ test('motion article is discoverable, sourced and has valid article metadata', a
 	expect(schema.datePublished).toBe('2026-10-21');
 	expect(schema.mainEntityOfPage).toBe(`https://a2o.kr${route}`);
 	await expect(page.locator('meta[property="og:type"]')).toHaveAttribute('content', 'article');
+	await expect(page.locator('meta[property="og:title"]')).toHaveAttribute(
+		'content',
+		`${title} | A2O`
+	);
+	await expect(page.locator('meta[property="og:image"]')).toHaveAttribute(
+		'content',
+		'https://a2o.kr/og-default.png'
+	);
+	expect((await request.get('/og-default.png')).headers()['content-type']).toContain('image/png');
+	await expect(page.locator('#question-4 + p')).toContainText('지구 평균 지름의 약 18%');
 	await expect(page.locator('meta[name="twitter:title"]')).toHaveAttribute(
 		'content',
 		`${title} | A2O`
@@ -67,6 +77,7 @@ test('reference-frame toggle keeps time and relative geometry, supports keyboard
 	await page.goto(route);
 	const figure = page.getByTestId('motion-frame-comparison');
 	const slider = figure.getByRole('slider');
+	await expect(figure.locator('.frame-summary')).toContainText('태양 고정');
 	await slider.focus();
 	await slider.press('Home');
 	await slider.press('ArrowRight');
@@ -77,6 +88,11 @@ test('reference-frame toggle keeps time and relative geometry, supports keyboard
 	await galaxy.focus();
 	await galaxy.press('Enter');
 	await expect(galaxy).toHaveAttribute('aria-pressed', 'true');
+	await expect(figure.locator('.frame-summary')).toContainText('태양도 이동');
+	await expect(figure.locator('.legend')).toContainText('태양의 이동 경로');
+	const summaryBottom = (await figure.locator('.frame-summary').boundingBox())!;
+	const drawingTop = (await figure.locator('.drawing').boundingBox())!;
+	expect(summaryBottom.y + summaryBottom.height).toBeLessThanOrEqual(drawingTop.y);
 	await expect(galaxy).toBeFocused();
 	await expect(figure).toHaveAttribute('data-phase', '0.01');
 	const changedRelative = (await figure.getAttribute('data-relative-position'))!
@@ -91,6 +107,7 @@ test('reference-frame toggle keeps time and relative geometry, supports keyboard
 	await expect(figure).toHaveAttribute('data-phase', '1');
 	await figure.screenshot({ path: `artifacts/motion-article/${info.project.name}-galactic.png` });
 	await figure.getByRole('button', { name: '태양 기준', exact: true }).click();
+	await expect(figure.locator('.frame-summary')).toContainText('태양 고정');
 	await figure.screenshot({ path: `artifacts/motion-article/${info.project.name}-solar.png` });
 	await expect(page.locator('canvas')).toHaveCount(0);
 	expect(

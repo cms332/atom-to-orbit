@@ -8,7 +8,7 @@ import {
 import { solarAUPerYear } from './orbit-model';
 import { motionMeasurements, tenSecondTravelMeters } from '$lib/data/motion';
 import { motionArticle } from '$lib/content/motion-article';
-import { sourceById } from '$lib/data/science';
+import { objects, sourceById } from '$lib/data/science';
 
 describe('article motion science and reference frames', () => {
 	it('preserves the Earth–Sun relative position and projected length when changing frames', () => {
@@ -54,6 +54,10 @@ describe('article motion science and reference frames', () => {
 	it('keeps the SI speeds, units, calculation and all article citations consistent', () => {
 		expect(motionMeasurements.map((m) => m.metersPerSecond)).toEqual([1670 / 3.6, 29780, 230000]);
 		expect(tenSecondTravelMeters / 1000).toBe(2300);
+		const earth = objects.find((object) => object.id === 'earth')!;
+		expect(earth.dimensionKind).toBe('diameter');
+		expect(earth.approximation).toBe('mean');
+		expect(Math.round((tenSecondTravelMeters / earth.meters) * 100)).toBe(18);
 		for (const item of motionMeasurements) {
 			const conversion = item.displayUnit === 'km/h' ? 3.6 : 0.001;
 			expect(item.metersPerSecond * conversion).toBeCloseTo(

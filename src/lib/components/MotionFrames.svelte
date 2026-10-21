@@ -105,11 +105,20 @@
 			>
 		</div>
 	</div>
+	<p class="frame-summary" role="status" aria-live="polite" aria-atomic="true">
+		<strong>{frame === 'solar' ? '태양 고정' : '태양도 이동'}</strong>
+		<span
+			>{frame === 'solar'
+				? '지구의 길은 태양 둘레로 거의 닫힌 타원을 그립니다.'
+				: '태양의 이동이 더해져 지구의 지나온 길이 열립니다.'}</span
+		>
+	</p>
 	<div class="drawing">{@render drawing(frame, phase)}</div>
 	<div class="legend" aria-label="도식 범례">
 		<span><i class="earth"></i>지구와 지나온 길</span><span><i class="sun"></i>태양</span><span
 			><i class="start"></i>출발 위치</span
 		>
+		{#if frame === 'galactic'}<span><i class="sun-path"></i>태양의 이동 경로</span>{/if}
 	</div>
 	<div class="time-control">
 		<label for={`${uid}-time`}>같은 1년을 따라가기</label>
@@ -129,11 +138,6 @@
 		/>
 		<div class="time-labels" aria-hidden="true"><span>시작</span><span>약 1년 후 →</span></div>
 	</div>
-	<p class="frame-summary" role="status" aria-live="polite">
-		{frame === 'solar'
-			? '태양을 기준으로 보면 지구의 길은 거의 닫힌 타원입니다.'
-			: '은하 기준에서는 태양도 이동하므로 지구의 지나온 길이 열립니다.'}
-	</p>
 	<noscript>
 		<p>
 			JavaScript 없이도 두 기준을 비교할 수 있습니다. 위는 태양 기준, 아래는 같은 기간의 은하
@@ -219,6 +223,13 @@
 		background: var(--bg);
 		border: 1px solid var(--teal);
 	}
+	i.sun-path {
+		width: 18px;
+		height: 0;
+		border-radius: 0;
+		background: none;
+		border-top: 2px dashed #9a6c3e;
+	}
 	.time-control {
 		display: grid;
 		grid-template-columns: 1fr auto;
@@ -247,11 +258,18 @@
 	}
 	.frame-summary {
 		font-size: 14px;
-		line-height: 1.8;
+		line-height: 1.7;
 		color: var(--ink);
-		margin: 14px 0;
+		margin: 18px 0 0;
+		padding-left: 12px;
+		border-left: 2px solid var(--teal);
+		min-height: 3.4em;
+	}
+	.frame-summary strong {
+		display: block;
 	}
 	figcaption {
+		margin-top: 18px;
 		color: var(--muted);
 		font-size: 12px;
 		line-height: 1.9;
@@ -273,6 +291,9 @@
 		}
 		.legend {
 			gap: 9px 14px;
+		}
+		.frame-summary {
+			min-height: 5.1em;
 		}
 	}
 </style>
