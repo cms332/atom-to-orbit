@@ -29,4 +29,9 @@
 - 최종 로컬 보고서는 `artifacts/motion-feedback/local-results.json`; 수정 후 도식 캡처는 같은 폴더의 `after-*`에 보존한다.
 - 폰트 생성기의 기본 권한에서는 기존 fontTools 폴더 읽기가 제한되어 승인된 권한으로 재실행했다. 생성 직후 HTML/CSS 형식을 맞춘 뒤 린트가 통과했다. 폰트 버전은 `e641478ceb02`, 125,708바이트이며 프리로드와 CSS 주소가 일치한다.
 
-기존 A2O 전용 절차에 따른 공개 배포·최종 확인 결과는 아래에 추가한다.
+## 공개 반영
+
+- 릴리스 `20261021T044800Z`, 실제 소스 `719aba842f9517380cafc1999b8568c12b095080`, 소스 SHA-256 `6473f236268123df7ef992f8a09feb9fb36a3f776864d23d62b2a3783ce5d5a7`. 직전 정상 버전 `20261021T040426Z`를 유지한다.
+- Linux 타입 검사·49개 단위 테스트·정적 빌드·전환 전 정상 응답 검사가 통과했다. A2O 전용 호스트만 전환했고 기존 컨테이너 24개와 프록시 설정 6개를 보존했다. DNS 및 HGI를 변경하지 않았다.
+- 공개 PC 1440px / 모바일 360px에서 새 거리 비교, 두 기준의 안내·범례·상대 위치 유지, canonical·OG·Article, 버전화된 단일 폰트 요청과 기존 탐험기·설정을 확인했다. HTTP 경로 9개가 통과했으며 페이지 오류·자원 요청 실패가 없다. OG 이미지도 PNG 1200×630으로 정상 응답한다.
+- 실제 공개 `public-360-distance.png`와 `public-mobile-galactic.png`를 열어 문구·안내 배치를 확인했다. 상세 값과 캡처는 `artifacts/motion-feedback/public-release.json`, `public-verification.json`, `public-*`에 보관한다. 배포 결과 문서 커밋은 실제 배포 소스와 구분한다.
