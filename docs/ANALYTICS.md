@@ -4,7 +4,7 @@
 
 - 관리 주소: `https://stats.a2o.kr`. 사이트별 Website ID로 분리하고 필요하면 Teams/읽기 전용 계정을 사용한다. 공개 Share URL은 생성하지 않는다.
 - 고정 버전: Umami 3.4.0, PostgreSQL 17 Alpine. 서버에서 공식 이미지를 받은 뒤 RepoDigest를 `.env`에 기록한다. 업데이트 시 백업·호환성 검증·새 승인 후 digest를 교체한다.
-- 별도 Compose 프로젝트 `web-analytics`, `analytics-postgres-data` 영속 볼륨, 내부 DB 네트워크, 프록시 전용 웹 네트워크. PostgreSQL은 호스트 포트를 열지 않는다. Umami의 호스트 포트는 SSH 검수용 loopback `127.0.0.1:4371`에만 연다.
+- 별도 Compose 프로젝트 `web-analytics`, `analytics-postgres-data` 영속 볼륨, DB 전용 브리지 네트워크, 프록시 전용 웹 네트워크. PostgreSQL은 호스트 포트를 열지 않는다. 서버에 Docker의 `DOCKER-INTERNAL` 방화벽 체인이 없어 `internal: true` 생성이 실패했다. 기존 방화벽을 변경하지 않고 일반 전용 브리지로 구성하며 DB 컨테이너의 외부 송신까지 차단하는 설정은 아니다. Umami의 호스트 포트는 SSH 검수용 loopback `127.0.0.1:4371`에만 연다.
 - 자원 상한: Umami 1 CPU/1GiB, DB 1 CPU/512MiB. 같은 호스트의 디스크와 CPU를 공유하므로 부하·디스크 증가량을 확인한다. 기존 `pdb`, HGI, n8n은 재시작하지 않는다.
 - 관리자 초기 암호는 무작위로 교체하고 서버의 `~/web-analytics/admin-login.json`(0600)에 보관한다. 최초 로그인 시 인증 앱의 2FA 등록을 요구한다. 2FA 암호화 키는 `.env`와 함께 비공개 백업한다. 키·암호·백업은 Git에 넣지 않는다.
 - 추적 스크립트 및 `/api/send`는 방문자 브라우저가 접근할 수 있어야 한다. 전체 도메인에 Basic Auth를 걸지 않는다. 관리자 API의 인증과 추적 수집을 구분한다.
