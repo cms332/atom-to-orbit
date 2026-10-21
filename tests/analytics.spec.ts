@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import AxeBuilder from '@axe-core/playwright';
 
 test('public analytics records navigation and actions while stripping private URL values', async ({
 	page,
@@ -59,6 +60,11 @@ test('development previews never load the tracker and visitors can opt out', asy
 	});
 	await page.goto('/');
 	await page.getByText('방문 통계 안내', { exact: true }).click();
+	const accessibility = await new AxeBuilder({ page })
+		.include('.analytics-notice')
+		.withRules(['color-contrast'])
+		.analyze();
+	expect(accessibility.violations).toEqual([]);
 	await page.getByRole('button', { name: '이 브라우저의 통계 수집 중지' }).click();
 	await page.waitForLoadState();
 	await page.getByText('방문 통계 안내', { exact: true }).click();
