@@ -2,6 +2,7 @@
 	import '$lib/styles.css';
 	import Header from '$lib/components/Header.svelte';
 	import Footer from '$lib/components/Footer.svelte';
+	import Analytics from '$lib/components/Analytics.svelte';
 	import { page } from '$app/state';
 	let { children } = $props();
 </script>
@@ -19,5 +20,6 @@
 	/></svelte:head
 >
 <Header />
+<Analytics />
 <main id="main" tabindex="-1">{@render children()}</main>
 <Footer />

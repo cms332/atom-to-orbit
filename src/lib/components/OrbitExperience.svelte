@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount, tick } from 'svelte';
+	import { trackEvent } from '$lib/analytics';
 	import { orbitPlanets, MAX_ORBIT_YEARS, EMPHASIZED_SPEED } from '$lib/data/orbits';
 	import { orbitChapters, type CameraView } from '$lib/data/orbit-story';
 	import type { OrbitFrame } from '$lib/utils/orbit-model';
@@ -108,8 +109,10 @@
 					if (!storyPlaying) return;
 					elapsed += seconds;
 					if (elapsed >= STORY_STEP_SECONDS) {
-						if (chapter === orbitChapters.length - 1) storyFinished = true;
-						else step(chapter + 1);
+						if (chapter === orbitChapters.length - 1) {
+							storyFinished = true;
+							trackEvent('orbit_story_complete', { chapters: orbitChapters.length });
+						} else step(chapter + 1);
 					}
 				},
 				onError: () => {
@@ -124,6 +127,7 @@
 		}
 	}
 	function changeView(value: OrbitFrame) {
+		trackEvent('orbit_mode_change', { mode: value });
 		manual();
 		frame = value;
 		selected = 'sun';
@@ -135,6 +139,7 @@
 		if (frame === 'galactic') camera('trail');
 	}
 	function choosePlanet(id: string) {
+		trackEvent('orbit_target_select', { target: id });
 		pauseForCamera();
 		following = true;
 		physicalSizes = false;
@@ -172,6 +177,7 @@
 			return;
 		}
 		story = true;
+		trackEvent('orbit_story_start');
 		storyPaused = false;
 		step(0);
 	}

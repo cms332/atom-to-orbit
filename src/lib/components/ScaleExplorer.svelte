@@ -1,5 +1,6 @@
 <script lang="ts">
 	import ScaleScene from './ScaleScene.svelte';
+	import { trackEvent } from '$lib/analytics';
 	import LogAxis from './LogAxis.svelte';
 	import { objects, qualifications, sourceById, type ScaleObject } from '$lib/data/science';
 	import {
@@ -86,6 +87,7 @@
 		stopPlayback();
 		const object = objects.find((o) => o.id === id);
 		if (object) {
+			trackEvent('scale_target_select', { target: object.id, surface: compact ? 'home' : 'scale' });
 			exponent = Math.log10(object.meters);
 			onSelectionChange?.(exponent, 'push');
 		}
