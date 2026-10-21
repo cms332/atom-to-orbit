@@ -1,5 +1,4 @@
 import { test, expect } from '@playwright/test';
-import AxeBuilder from '@axe-core/playwright';
 
 test('public analytics records navigation and actions while stripping private URL values', async ({
 	page,
@@ -53,22 +52,20 @@ test('public analytics records navigation and actions while stripping private UR
 	await expect.poll(() => payloads.some((entry) => entry.name === 'orbit_mode_change')).toBe(true);
 });
 
-test('development previews never load the tracker and visitors can opt out', async ({ page }) => {
+test('development previews never load the tracker or show analytics controls', async ({
+	page
+}, info) => {
 	let trackerRequests = 0;
 	page.on('request', (request) => {
 		if (request.url().startsWith('https://stats.a2o.kr/')) trackerRequests++;
 	});
 	await page.goto('/');
-	await page.getByText('방문 통계 안내', { exact: true }).click();
-	const accessibility = await new AxeBuilder({ page })
-		.include('.analytics-notice')
-		.withRules(['color-contrast'])
-		.analyze();
-	expect(accessibility.violations).toEqual([]);
-	await page.getByRole('button', { name: '이 브라우저의 통계 수집 중지' }).click();
-	await page.waitForLoadState();
-	await page.getByText('방문 통계 안내', { exact: true }).click();
-	await expect(page.getByRole('button', { name: '이 브라우저의 통계 수집 허용' })).toBeVisible();
-	expect(await page.evaluate(() => localStorage.getItem('umami.disabled'))).toBe('1');
+	await expect(page.locator('footer .back-to-top')).toHaveClass(/floating/);
+	await expect(page.getByText('방문 통계 안내', { exact: true })).toHaveCount(0);
+	await expect(page.getByRole('button', { name: /이 브라우저의 통계 수집/ })).toHaveCount(0);
 	expect(trackerRequests).toBe(0);
+	await page.getByRole('contentinfo').scrollIntoViewIfNeeded();
+	await page.screenshot({
+		path: `artifacts/footer-notice-removal/${info.project.name}-footer.png`
+	});
 });

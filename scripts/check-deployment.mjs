@@ -10,6 +10,7 @@ assert.equal(infoResponse.status, 200);
 const info = await infoResponse.json();
 assert.match(info.commit, /^[a-f0-9]{40}$/);
 assert.match(info.release, /^\d{8}T\d{6}Z$/);
+if (process.env.A2O_EXPECTED_COMMIT) assert.equal(info.commit, process.env.A2O_EXPECTED_COMMIT);
 const responses = [];
 for (const route of [
 	'/',
@@ -77,6 +78,9 @@ try {
 		for (const route of ['/', '/scale/', '/articles/']) {
 			await page.goto(origin + route);
 			await expect(page.locator('h1')).toBeVisible();
+			await expect(page.locator('footer .back-to-top')).toHaveClass(/floating/);
+			await expect(page.getByText('방문 통계 안내', { exact: true })).toHaveCount(0);
+			await expect(page.getByRole('button', { name: /이 브라우저의 통계 수집/ })).toHaveCount(0);
 			assert.ok(
 				await page.evaluate(
 					() => document.documentElement.scrollWidth <= document.documentElement.clientWidth
@@ -85,6 +89,10 @@ try {
 			await page.screenshot({
 				path: `${folder}/${width}-${route === '/' ? 'home' : route.replaceAll('/', '')}.png`
 			});
+			if (route === '/') {
+				await page.getByRole('contentinfo').scrollIntoViewIfNeeded();
+				await page.screenshot({ path: `${folder}/${width}-footer.png` });
+			}
 		}
 		await page.goto(`${origin}/articles/why-earth-feels-still/`);
 		await expect(page.getByRole('heading', { level: 1 })).toHaveText(
@@ -221,12 +229,31 @@ try {
 		const story = page.getByRole('button', { name: '스토리', exact: true });
 		await story.click();
 		await story.click();
-		for (let chapter = 2; chapter <= 5; chapter++) {
+		for (let chapter = 2; chapter <= 6; chapter++) {
 			await page.getByRole('button', { name: '다음 이야기', exact: true }).click();
 			if (chapter < 4) continue;
 			await expect(canvas).toHaveAttribute('data-transitioning', 'false');
 			await page.screenshot({ path: `${folder}/${width}-chapter${chapter}.png` });
 		}
+		await expect(canvas).toHaveAttribute('data-preset', 'earth-journey');
+		await expect(canvas).toHaveAttribute('data-earth-camera', 'original-close');
+		await expect(canvas).toHaveAttribute('data-size-mode', 'physical');
+		await expect(canvas).toHaveAttribute('data-earth-orbit', 'false');
+		await expect(canvas).toHaveAttribute('data-orbits', '7');
+		await expect(canvas).toHaveAttribute('data-trails', '8');
+		await expect(canvas).toHaveAttribute('data-sun-trail', 'true');
+		await expect(page.locator('.story h2')).toHaveText('지구는 꿈을 싣고');
+		const finaleYear = Number(await canvas.getAttribute('data-year'));
+		for (let sample = 0; sample < 3; sample++) {
+			await page.waitForTimeout(700);
+			await expect(canvas).toHaveAttribute('data-earth-orbit', 'false');
+			assert.ok(Number(await canvas.getAttribute('data-trace-head-gap-au')) < 1e-10);
+			await page.screenshot({ path: `${folder}/${width}-chapter6-${sample}.png` });
+		}
+		assert.ok(Number(await canvas.getAttribute('data-year')) > finaleYear);
+		await page.getByRole('button', { name: '은하 궤적', exact: true }).click();
+		await expect(canvas).toHaveAttribute('data-earth-orbit', 'true');
+		await expect(canvas).toHaveAttribute('data-orbits', '8');
 		assert.deepEqual(errors, []);
 		assert.deepEqual(failures, []);
 		views.push({ width, errors, failures });

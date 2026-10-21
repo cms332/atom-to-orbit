@@ -806,6 +806,8 @@ test('opening and final Earth views survive resize, follow motion and keep trans
 	await expectUncoveredBody(page, 'earth');
 	await expect(canvas).toHaveAttribute('data-earth-camera', 'original-close');
 	await expect(canvas).toHaveAttribute('data-trace-end-on-fade', 'true');
+	await expect(canvas).toHaveAttribute('data-earth-orbit', 'false');
+	await expect(canvas).toHaveAttribute('data-orbits', '7');
 	await expect(page.locator('.story > p')).toHaveText(
 		'다시 우리의 지구를 바라보세요. 지구에서 살아가는 모든 존재의 삶과 꿈을 싣고 지금도 고요한 여정을 이어가고 있습니다.'
 	);
@@ -856,6 +858,7 @@ test('opening and final Earth views survive resize, follow motion and keep trans
 	await page.keyboard.press('ArrowRight');
 	await expect(canvas).toHaveAttribute('data-preset', 'earth-journey');
 	await expectLiveTrace(page, 1e-10);
+	await expect(canvas).toHaveAttribute('data-earth-orbit', 'false');
 	await page.screenshot({
 		path: `artifacts/orbit-earth-free-camera/${info.project.name}-completed.png`
 	});
@@ -873,6 +876,7 @@ test('opening and final Earth views survive resize, follow motion and keep trans
 	await expect(canvas).toHaveAttribute('data-size-mode', 'illustrative');
 	await expect(canvas).toHaveAttribute('data-trace-end-on-fade', 'false');
 	await expect(canvas).toHaveAttribute('data-trace-suppressed-points', '0');
+	await expect(canvas).toHaveAttribute('data-earth-orbit', 'true');
 	await page.getByRole('button', { name: '스토리', exact: true }).click();
 	for (let chapter = 2; chapter <= 6; chapter++)
 		await page.getByRole('button', { name: '다음 이야기', exact: true }).click();
