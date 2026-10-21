@@ -798,7 +798,11 @@ export function createOrbitRenderer(
 						)
 			);
 			body.mesh.rotation.y = now * 2;
-			body.orbit.visible = options.orbits && !closeView;
+			// This J2000 heliocentric guide is separate from the galactic history.
+			// Its 256 chords sweep across the physical Earth close-up as displaced,
+			// alternating tangent lines. Keep the actual trail and other guides;
+			// overlay Earth's reference ellipse only in the wider explanatory views.
+			body.orbit.visible = options.orbits && !closeView && !(earthJourney && body === earth);
 			body.trail.visible =
 				options.trails && !closeView && options.visibleTrails.includes(body.planet.id);
 			body.orbit.material.opacity = earthJourney ? 0.1 : 0.2;
@@ -996,6 +1000,7 @@ export function createOrbitRenderer(
 			earthJourney && earth.sampleTrail.quality.budgetLimited
 		);
 		canvas.dataset.orbits = String(bodies.filter((body) => body.orbit.visible).length);
+		canvas.dataset.earthOrbit = String(earth.orbit.visible);
 		canvas.dataset.sunVisible = String(sun.visible);
 		canvas.dataset.sunTrail = String(sunTrail.visible);
 		canvas.dataset.bodies = bodies
