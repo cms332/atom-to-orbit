@@ -195,6 +195,10 @@
 		max-width: 440px;
 		font-size: 12px;
 		line-height: 1.7;
+		color: var(--on-deep-muted);
+		border: 0;
+		padding: 0;
+		margin: 0;
 	}
 	.analytics-notice summary {
 		cursor: pointer;
@@ -202,6 +206,7 @@
 	}
 	.analytics-notice p {
 		margin: 0 0 12px;
+		color: var(--on-deep-muted);
 	}
 	.analytics-notice button {
 		color: var(--on-deep);
