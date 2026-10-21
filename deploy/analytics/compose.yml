@@ -64,7 +64,6 @@ volumes:
 networks:
   database:
     name: analytics-database
-    internal: true
   web:
     name: analytics-web
     external: true
