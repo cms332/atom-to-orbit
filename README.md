@@ -1,6 +1,18 @@
 # A2O — Atom to Orbit
 
-한국어 독립 과학 아카이브 [A2O — Atom to Orbit](https://a2o.kr). Svelte 5, SvelteKit 2, TypeScript, Vite, Bun 및 `adapter-static`을 사용합니다.
+**A2O = Atom to Orbit.** 크기·거리·운동을 출처가 연결된 시각화로 설명하는 한국어 독립 과학 아카이브입니다. 실제 사이트: [a2o.kr](https://a2o.kr).
+
+Svelte 5, SvelteKit 2, TypeScript, Vite, Bun 및 `adapter-static`을 사용합니다. 로컬 개발과 검증 → GitHub 버전 기록 → 소유자의 별도 승인 후 서버 배포 순서로 관리합니다.
+
+## 개발 이력과 공개 범위
+
+GitHub 저장소: [cms332/atom-to-orbit](https://github.com/cms332/atom-to-orbit). 소유자가 [검토 기록](docs/GITHUB_PUBLICATION_REVIEW.md)과 [전체 파일 목록](docs/GITHUB_PUBLICATION_FILES.md)을 확인하고 기존 이력 포함 Public 공개를 승인했습니다. 기존 커밋과 배포 태그는 보존하며 과거 날짜나 서명을 새로 만들지 않습니다.
+
+[GitHub 관리 절차](docs/GITHUB_WORKFLOW.md)에 서명 커밋 준비, main 보호, CI와 릴리스 방식을 기록합니다. CI는 코드 검사·테스트·정적 빌드만 수행하며 운영 서버를 자동 배포하지 않습니다. 기사 등 로컬 수정은 GitHub에 기록하더라도 별도 배포 승인 전까지 실제 운영 버전과 다를 수 있습니다.
+
+개인 키·토큰·환경 설정·DB·의존성·빌드 결과·로컬 캡처는 관리 대상에서 제외합니다. 기존 이력에는 운영 접속 메타데이터와 작성자 이메일이 남아 있으므로 최초 공개 승인 때 이를 함께 확인합니다. `.gitignore`가 과거 내용을 지우지는 않습니다.
+
+A2O가 작성한 코드·원고·도판·브랜드에는 별도의 오픈소스 재사용 라이선스를 부여하지 않았습니다. 외부 폰트·텍스처·라이브러리에는 각각의 조건이 적용됩니다. [외부 자료와 라이선스 고지](THIRD_PARTY_NOTICES.md)를 참고합니다.
 
 `/orbit/`에는 자동으로 열리고 항상 움직이는 Three.js 궤도 탐험기가 있습니다. 기본 도크는 스토리·태양계·은하 궤적 세 조작으로 구성하며, 태양계는 수성·금성·지구·화성 중심으로 시작합니다. 태양·8행성 표면, 좌표계·속도 비교와 자동 진행하는 한국어 이야기를 제공합니다. [초기 설계](docs/ORBIT_EXPLORER_DESIGN.md), [간소화 재설계](docs/ORBIT_EXPLORER_REFINEMENT.md), 현재 [상시 움직임·자동 이야기](docs/ORBIT_CONTINUOUS_MOTION.md)를 참고합니다. 홈과 헤더는 크기 탐험하기 → 궤도 탐험하기 → 과학 이야기 읽기 순서입니다.
 

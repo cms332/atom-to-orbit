@@ -1,20 +1,26 @@
 <script lang="ts">
 	import { motionMeasurements } from '$lib/data/motion';
+	let { sourceIds }: { sourceIds: readonly string[] } = $props();
 </script>
 
 <aside class="motion-speeds" aria-label="움직이는 지구의 대표 속도">
 	<dl>
 		{#each motionMeasurements as item (item.id)}
+			{@const sourceNumber = sourceIds.indexOf(item.sourceId) + 1}
 			<div>
 				<dt>{item.name}</dt>
 				<dd class="value">
 					<span class="approx">약</span> <strong>{item.displayValue}</strong>
 					<span>{item.displayUnit}</span>
+					<a
+						class="source-ref"
+						href={`#source-${item.sourceId}`}
+						aria-label={`${item.name} 출처 ${sourceNumber}`}>[{sourceNumber}]</a
+					>
 				</dd>
 				<dd class="frame">{item.frame}</dd>
 				<dd class="detail">
 					{item.note}
-					<a href={`#source-${item.sourceId}`} aria-label={`${item.name} 수치의 출처`}>출처 ↗</a>
 				</dd>
 			</div>
 		{/each}
@@ -25,8 +31,6 @@
 <style>
 	.motion-speeds {
 		margin: 32px 0;
-		border-block: 1px solid var(--line);
-		padding-block: 26px 18px;
 	}
 	dl {
 		display: grid;
@@ -35,7 +39,6 @@
 	}
 	dl > div {
 		padding-inline: 18px;
-		border-left: 1px solid var(--line);
 		min-width: 0;
 	}
 	dl > div:first-child {
@@ -83,10 +86,18 @@
 	.detail {
 		margin-top: 5px;
 	}
-	.detail a {
-		display: inline-block;
-		padding-block: 5px;
-		color: var(--teal);
+	.source-ref {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		min-width: 44px;
+		min-height: 44px;
+		font: 12px var(--font-mono);
+		text-decoration: none;
+	}
+	.source-ref:hover,
+	.source-ref:focus-visible {
+		text-decoration: underline;
 	}
 	.motion-speeds p {
 		margin: 22px 0 0;
@@ -103,7 +114,6 @@
 			column-gap: 12px;
 			padding: 19px 0;
 			border: 0;
-			border-top: 1px solid var(--line);
 		}
 		dl > div:first-child {
 			border-top: 0;

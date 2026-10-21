@@ -8,7 +8,6 @@ export const motionArticle: Article = {
 	intro:
 		'움직이는 지구 위에서 멈춰 있다고 느끼는 이유. 속도와 힘, 그리고 관측 기준으로 풀어봅니다.',
 	date: '2026-10-21',
-	readingMinutes: 3,
 	diagram: 'motion',
 	sourceIds: [
 		'motion-rotation',

@@ -1,11 +1,13 @@
 <script lang="ts">
+	import ArticleDisclosure from './ArticleDisclosure.svelte';
+	let { inArticle = false }: { inArticle?: boolean } = $props();
 	import { EARTH_MOON_METERS, objects } from '$lib/data/science';
 	const earth = objects.find((o) => o.id === 'earth')!;
 	const moon = objects.find((o) => o.id === 'moon')!;
 	const factor = 800 / EARTH_MOON_METERS;
 </script>
 
-<figure class="distance-figure">
+<figure class="distance-figure" class:article={inArticle}>
 	<div class="figure-top"><span>EARTH ↔ MOON</span><span>LINEAR SCALE / 1 : SAME</span></div>
 	<div class="distance-stat">384,400 <span>km</span><small>평균 중심 간 거리</small></div>
 	<svg
@@ -30,8 +32,16 @@
 		>
 	</svg>
 	<figcaption>
-		지름과 거리는 같은 축척입니다. 작은 달의 점도 실제 비례입니다.<br />자료: NASA Earth / Moon Fact
-		Sheet · 평균 지름 기준
+		{#if inArticle}
+			<ArticleDisclosure class="model-notes" label="모형 설명">
+				<p>지름과 거리는 같은 축척입니다. 작은 달의 점도 실제 비례입니다. 평균 지름 기준입니다.</p>
+				<a href="#source-earth">NASA · Earth Fact Sheet ↗</a><br />
+				<a href="#source-moon">NASA · Moon Fact Sheet ↗</a>
+			</ArticleDisclosure>
+		{:else}
+			지름과 거리는 같은 축척입니다. 작은 달의 점도 실제 비례입니다.<br />자료: NASA Earth / Moon
+			Fact Sheet · 평균 지름 기준
+		{/if}
 	</figcaption>
 </figure>
 
@@ -43,6 +53,9 @@
 		border: 1px solid #d3e0dd;
 		border-radius: 14px;
 		overflow: hidden;
+	}
+	.distance-figure.article {
+		border-radius: 12px;
 	}
 	.figure-top {
 		display: flex;

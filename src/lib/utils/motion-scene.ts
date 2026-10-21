@@ -5,6 +5,8 @@ const earth = orbitPlanets.find((planet) => planet.id === 'earth')!;
 export const MOTION_START_YEAR = 8;
 export const MOTION_DURATION = orbitPeriod(earth);
 export const MOTION_DISPLAY_FACTOR = EMPHASIZED_SPEED;
+// Trim spare side margins to enlarge the whole drawing uniformly by 1.7 at the same CSS width.
+export const MOTION_VIEW_BOX = [(640 - 640 / 1.7) / 2, 0, 640 / 1.7, 310] as const;
 
 /** The galactic diagram has one fixed origin: the Sun at the start of the interval. */
 export function motionPositions(phase: number, frame: OrbitFrame) {

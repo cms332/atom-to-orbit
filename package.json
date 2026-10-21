@@ -13,8 +13,8 @@
 		"build": "vite build",
 		"preview": "vite preview --host 127.0.0.1",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
-		"lint": "eslint . && prettier --check src tests scripts docs static deploy \"*.{md,ts,js,json}\" .prettierrc --ignore-unknown",
-		"format": "prettier --write src tests scripts docs static deploy \"*.{md,ts,js,json}\" .prettierrc --ignore-unknown",
+		"lint": "eslint . && prettier --check src tests scripts docs static deploy .github \"*.{md,ts,js,json}\" .prettierrc --ignore-unknown",
+		"format": "prettier --write src tests scripts docs static deploy .github \"*.{md,ts,js,json}\" .prettierrc --ignore-unknown",
 		"test": "vitest run",
 		"test:e2e": "playwright test"
 	},

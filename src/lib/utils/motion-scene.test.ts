@@ -3,7 +3,8 @@ import {
 	motionPositions,
 	motionScene,
 	MOTION_DURATION,
-	MOTION_DISPLAY_FACTOR
+	MOTION_DISPLAY_FACTOR,
+	MOTION_VIEW_BOX
 } from './motion-scene';
 import { solarAUPerYear } from './orbit-model';
 import { motionMeasurements, tenSecondTravelMeters } from '$lib/data/motion';
@@ -42,10 +43,10 @@ describe('article motion science and reference frames', () => {
 			for (let i = 0; i <= 100; i++) {
 				const scene = motionScene(frame, i / 100);
 				for (const [x, y] of [scene.sun, scene.earth, scene.start]) {
-					expect(x).toBeGreaterThan(20);
-					expect(x).toBeLessThan(620);
-					expect(y).toBeGreaterThan(20);
-					expect(y).toBeLessThan(290);
+					expect(x).toBeGreaterThan(MOTION_VIEW_BOX[0] + 20);
+					expect(x).toBeLessThan(MOTION_VIEW_BOX[0] + MOTION_VIEW_BOX[2] - 20);
+					expect(y).toBeGreaterThan(MOTION_VIEW_BOX[1] + 20);
+					expect(y).toBeLessThan(MOTION_VIEW_BOX[1] + MOTION_VIEW_BOX[3] - 20);
 				}
 				expect(scene.pastPath).not.toMatch(/NaN|Infinity|Z/);
 			}

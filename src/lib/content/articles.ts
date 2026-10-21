@@ -9,7 +9,6 @@ export interface Article {
 	date: string;
 	sourceIds: string[];
 	diagram: 'moon' | 'atom' | 'motion';
-	readingMinutes?: number;
 	opening?: string[];
 	sourceNote?: string;
 	sections: {

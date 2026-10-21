@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import ArticleDisclosure from './ArticleDisclosure.svelte';
 	import type { OrbitFrame } from '$lib/utils/orbit-model';
-	import { motionScene } from '$lib/utils/motion-scene';
+	import { motionScene, MOTION_VIEW_BOX } from '$lib/utils/motion-scene';
 	let frame = $state<OrbitFrame>('solar');
 	let phase = $state(1);
 	let mounted = $state(false);
@@ -22,9 +23,7 @@
 		const from = phase;
 		const started = performance.now();
 		// Explicit playback follows the same path more slowly when motion reduction is requested.
-		const duration = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-			? 18_000
-			: 12_000;
+		const duration = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 12_000 : 8_000;
 		playing = true;
 		function tick(now: number) {
 			if (!playing) return;
@@ -53,7 +52,7 @@
 {#snippet drawing(view: OrbitFrame, progress: number)}
 	{@const viewScene = motionScene(view, progress)}
 	<svg
-		viewBox="0 0 640 310"
+		viewBox={MOTION_VIEW_BOX.join(' ')}
 		role="img"
 		aria-label={view === 'solar'
 			? '태양을 기준으로 약 한 바퀴의 지구 공전을 본 투영도'
@@ -62,7 +61,8 @@
 	>
 		<desc
 			>빈 원은 지구의 출발 위치, 청록색 실선은 지나온 길, 옅은 점선은 약 한 바퀴의 전체 경로입니다.
-			구리색 원과 점선은 태양과 태양의 이동 경로입니다.</desc
+			구리색 원과 점선은 태양과 태양의 이동 경로입니다. 태양의 은하 이동 성분은 1/20로 표시하며 천체
+			기호는 실제 크기 비례가 아닙니다.</desc
 		>
 		<path d="M30 155H610M320 30V280" stroke="#c2d2d5" stroke-width="1" stroke-dasharray="3 7" />
 		<path
@@ -207,11 +207,16 @@
 		<div class="drawing">{@render drawing('galactic', 1)}</div>
 	</noscript>
 	<figcaption>
-		같은 시각·같은 공전 계산을 같은 방향에서 투영했습니다. 기준만 바꾸며 태양과 지구의 상대 위치는
-		유지됩니다.<br />
-		<strong>표시 모형 · 태양의 은하 이동 성분은 1/20 · 천체 기호는 크기 비례 아님.</strong>
-		실제 3D 궤적의 모습은 시선에 따라 달라집니다. J2000 + 8년부터 약 1년을 계산했으며 실시간 위치가 아닙니다.
-		<a href="#source-motion-jpl">계산의 출처 ↗</a>
+		<ArticleDisclosure class="model-notes" label="모형 설명">
+			<p>
+				같은 시각·같은 공전 계산을 같은 방향에서 투영했습니다. 기준만 바꾸며 태양과 지구의 상대
+				위치는 유지됩니다.<br />
+				<strong>표시 모형 · 태양의 은하 이동 성분은 1/20 · 천체 기호는 크기 비례 아님.</strong>
+				실제 3D 궤적의 모습은 시선에 따라 달라집니다. J2000 + 8년부터 약 1년을 계산했으며 실시간 위치가
+				아닙니다.
+				<a href="#source-motion-jpl">계산의 출처 ↗</a>
+			</p>
+		</ArticleDisclosure>
 	</figcaption>
 </figure>
 
@@ -349,10 +354,6 @@
 	}
 	figcaption strong {
 		font-weight: 650;
-	}
-	figcaption a {
-		display: inline-block;
-		padding-block: 5px;
 	}
 	noscript p {
 		font-size: 13px;

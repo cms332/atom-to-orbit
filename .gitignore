@@ -16,3 +16,16 @@ debug.log
 *.pem
 *.key
 *.pfx
+*.p12
+*.jks
+*.keystore
+*.sqlite
+*.sqlite3
+*.db
+*.log
+*.bundle
+*.tar
+*.tar.gz
+*.tgz
+*.zip
+__pycache__/

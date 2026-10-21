@@ -57,7 +57,9 @@ test('motion article is discoverable, sourced and has valid article metadata', a
 	await expect(page.locator('.article-sources li')).toHaveCount(10);
 	for (const link of await page.locator('.article-sources li > a').all())
 		expect(await link.getAttribute('href')).toMatch(/^https:\/\//);
-	await page.getByRole('link', { name: '지구 자전 수치의 출처', exact: true }).click();
+	await expect(page.locator('.motion-speeds details')).toHaveCount(0);
+	await page.getByRole('link', { name: '지구 자전 출처 1', exact: true }).click();
+	await expect(page.locator('.sources-disclosure')).toHaveAttribute('open');
 	await expect(page.locator('#source-motion-rotation')).toBeInViewport();
 	await expect(
 		page.getByRole('link', { name: '궤도 탐험에서 직접 보기 ↗', exact: true })
@@ -77,6 +79,13 @@ test('reference-frame toggle keeps time and relative geometry, supports keyboard
 	await page.goto(route);
 	const figure = page.getByTestId('motion-frame-comparison');
 	const slider = figure.getByRole('slider');
+	const notes = figure.locator('.model-notes');
+	const explanation = notes.locator('summary');
+	const calculationSource = notes.getByRole('link', { name: '계산의 출처 ↗', exact: true });
+	await expect(notes).not.toHaveAttribute('open');
+	await expect(calculationSource).not.toBeVisible();
+	const initialDrawing = (await figure.locator('.drawing').boundingBox())!;
+	expect(initialDrawing.height).toBeCloseTo(initialDrawing.width * (310 / 640) * 1.7, 1);
 	await expect(figure.locator('.frame-summary')).toContainText('태양 고정');
 	await slider.focus();
 	await slider.press('Home');
@@ -109,6 +118,18 @@ test('reference-frame toggle keeps time and relative geometry, supports keyboard
 	await figure.getByRole('button', { name: '태양 기준', exact: true }).click();
 	await expect(figure.locator('.frame-summary')).toContainText('태양 고정');
 	await figure.screenshot({ path: `artifacts/motion-article/${info.project.name}-solar.png` });
+	await explanation.focus();
+	await explanation.press('Enter');
+	await expect(notes).toHaveAttribute('open');
+	await expect(calculationSource).toBeVisible();
+	await figure.screenshot({ path: `artifacts/motion-article/${info.project.name}-notes-open.png` });
+	await explanation.press('Space');
+	await expect(notes).not.toHaveAttribute('open');
+	await expect(calculationSource).not.toBeVisible();
+	await explanation.click();
+	await expect(calculationSource).toBeVisible();
+	await explanation.click();
+	await expect(calculationSource).not.toBeVisible();
 	await expect(page.locator('canvas')).toHaveCount(0);
 	expect(
 		(await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa']).analyze())
@@ -173,8 +194,7 @@ test('both frames play, pause in place, resume, scrub and restart after completi
 		expect(await phase()).toBe(0);
 		await page.clock.runFor(1200);
 		const progressed = await phase();
-		expect(progressed).toBeGreaterThan(0.05);
-		expect(progressed).toBeLessThan(0.15);
+		expect(progressed).toBeCloseTo(reducedMotion === 'reduce' ? 0.1 : 0.15, 2);
 		await playback.click();
 		const paused = await phase();
 		await expect(playback.locator('svg polygon')).toHaveCount(1);
@@ -233,6 +253,10 @@ test('article and both frame diagrams remain available without JavaScript', asyn
 	await expect(page.getByRole('heading', { level: 1 })).toHaveText(title);
 	await expect(page.getByTestId('motion-solar-diagram')).toBeVisible();
 	await expect(page.getByTestId('motion-galactic-diagram')).toBeVisible();
-	await expect(page.getByRole('heading', { name: '자료 및 출처', exact: true })).toBeVisible();
+	const notes = page.getByTestId('motion-frame-comparison').locator('.model-notes');
+	await expect(notes).not.toHaveAttribute('open');
+	await notes.locator('summary').click();
+	await expect(notes.getByRole('link', { name: '계산의 출처 ↗', exact: true })).toBeVisible();
+	await expect(page.locator('.sources-disclosure > summary')).toHaveText('자료 및 출처');
 	await context.close();
 });

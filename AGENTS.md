@@ -22,7 +22,8 @@ This repository builds the independent Korean science atlas `a2o.kr`.
 2. Implement in coherent phases, check responsive fidelity and accessibility.
 3. Validate with `bun run check`, `bun run lint`, `bun run test`, `bun run build` where configured; add Playwright smoke/visual tests when appropriate.
 4. Show local previews and actual test/screenshot results and unresolved issues.
-5. **Never deploy publicly or change DNS/domains without explicit owner approval.**
+5. **Never deploy publicly or change DNS/domains without explicit owner approval.** Develop and verify each change locally, show the local preview/result to the owner, and deploy only after the owner explicitly asks to deploy that reviewed change. Do not carry forward deployment approval from an earlier change.
+   Before deploying, commit and push the reviewed source to the authorized GitHub repository and confirm CI passes for the exact commit being deployed. Then deploy that commit, verify the public build metadata/behavior, and record the result. GitHub synchronization does not itself authorize production deployment; obtain any separately required initial public-history approval before the first public Push.
 6. Keep commits truthful; do not forge past timestamps. Record actual changes in `docs/A2O_DECISIONS_AND_PROGRESS.md`. The owner removed the public `/method`, `/updates` and `/about` pages, their navigation entries and homepage method teaser on 2026-10-19; do not restore them without a new request. Keep source-backed measurements and per-object/article citations.
 
 If in doubt, favor **correct and genuinely useful** over decorative and impressive-looking.

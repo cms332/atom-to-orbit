@@ -408,7 +408,7 @@ test('without JavaScript, content and scale table remain readable', async ({
 	await page.goto('http://127.0.0.1:4173/');
 	expect((await page.getByTestId('scale-scene').boundingBox())!.height).toBeCloseTo(sceneHeight, 1);
 	await page.goto('http://127.0.0.1:4173/articles/earth-moon/');
-	await expect(page.getByRole('heading', { name: '자료 및 출처' })).toBeVisible();
+	await expect(page.locator('.sources-disclosure > summary')).toHaveText('자료 및 출처');
 	await context.close();
 });
 

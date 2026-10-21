@@ -5,11 +5,52 @@
 	import MotionSpeeds from '$lib/components/MotionSpeeds.svelte';
 	import TrainInertia from '$lib/components/TrainInertia.svelte';
 	import MotionFrames from '$lib/components/MotionFrames.svelte';
+	import ArticleDisclosure from '$lib/components/ArticleDisclosure.svelte';
 	import { sourceById } from '$lib/data/science';
 	import { articles } from '$lib/content/articles';
 	import type { PageData } from './$types';
 	let { data }: { data: PageData } = $props();
 	let article = $derived(data.article);
+	function revealSourceReferences(node: HTMLElement) {
+		const revealHash = (hash: string) => {
+			if (!hash.startsWith('#source-')) return;
+			const target = document.getElementById(hash.slice(1));
+			if (!target || !node.contains(target)) return;
+			for (
+				let parent = target.parentElement;
+				parent && parent !== node;
+				parent = parent.parentElement
+			) {
+				if (parent instanceof HTMLDetailsElement) parent.open = true;
+			}
+		};
+		const click = (event: MouseEvent) => {
+			if (
+				event.defaultPrevented ||
+				event.button !== 0 ||
+				event.ctrlKey ||
+				event.metaKey ||
+				event.shiftKey ||
+				event.altKey
+			)
+				return;
+			const link =
+				event.target instanceof Element
+					? event.target.closest<HTMLAnchorElement>('a[href^="#source-"]')
+					: null;
+			if (link) revealHash(link.hash);
+		};
+		const hashChange = () => revealHash(window.location.hash);
+		queueMicrotask(hashChange);
+		node.addEventListener('click', click);
+		window.addEventListener('hashchange', hashChange);
+		return {
+			destroy() {
+				node.removeEventListener('click', click);
+				window.removeEventListener('hashchange', hashChange);
+			}
+		};
+	}
 	const structuredData = $derived(
 		JSON.stringify({
 			'@context': 'https://schema.org',
@@ -36,139 +77,119 @@
 	<!-- eslint-disable-next-line svelte/no-at-html-tags -->
 	{@html schemaMarkup}
 </svelte:head>
-<article class="wrap page-content">
-	<header class="article-header reading">
-		<a class="text-link" href="/articles/">← 과학 이야기</a>
-		<p class="article-category">{article.category}</p>
-		<h1>{article.title}</h1>
-		<p class="intro">{article.intro}</p>
-		{#if article.diagram === 'motion'}<p class="article-details">
-				<time datetime={article.date}>{article.date.replaceAll('-', '.')}</time><span
-					>약 {article.readingMinutes}분 읽기</span
-				>
-			</p>{/if}
-	</header>
-	<div class="reading">
-		{#each article.opening ?? [] as paragraph (paragraph)}<p>{paragraph}</p>{/each}
-		<p class="lead">{article.takeaway}</p>
-		{#if article.diagram === 'motion'}<MotionSpeeds />{/if}
-		<nav class="article-nav" aria-label="이 글의 순서">
-			<span class="contents-label">이 글의 순서</span>
-			<ol>
-				{#each article.sections as section, i (section.title)}<li>
-						<a href={`#question-${i + 1}`}
-							><span aria-hidden="true">0{i + 1}</span>{section.title}</a
-						>
-					</li>{/each}
-			</ol>
-		</nav>
-		{#if article.diagram === 'moon'}<MoonDistance />{:else if article.diagram === 'atom'}<figure
-				class="atom-figure"
-			>
-				<div class="atom-art"><Diagram kind="atom" /></div>
-				<strong>2a₀ ≈ 0.106 nm</strong>
-				<figcaption>
-					보어 반지름의 두 배를 기준 길이로 사용합니다.<br />상징적 도식 · 전자 궤도나 실제 크기
-					비례를 나타내지 않습니다.<br />자료: NIST · 2022 CODATA
-				</figcaption>
-			</figure>{/if}{#each article.sections as section, i (section.title)}<section>
-				<h2 id={`question-${i + 1}`}>{section.title}</h2>
-				<p>{section.text}</p>
-				{#each section.paragraphs ?? [] as paragraph (paragraph)}<p>{paragraph}</p>{/each}
-				{#if section.keyPoint}<p class="key-point">{section.keyPoint}</p>{/if}
-				{#if section.sourceIds}<p class="section-sources">
-						자료:
-						{#each section.sourceIds as id (id)}<a href={`#source-${id}`}
-								>[{article.sourceIds.indexOf(id) + 1}] {sourceById(id).label}</a
-							>{/each}
-					</p>{/if}
-				{#if section.visual === 'inertia'}<TrainInertia
-					/>{:else if section.visual === 'frames'}<MotionFrames />{/if}
-			</section>{/each}
-		{#if article.diagram === 'motion'}
-			<aside class="orbit-invitation">
-				<h2>이제, 시선을 은하 속으로.</h2>
-				<p>
-					태양과 여덟 행성의 움직임을 궤도 탐험기에서 이어 보세요. ‘태양계’와 ‘은하 궤적’을 오가며
-					같은 운동의 다른 모습을 만날 수 있습니다.
-				</p>
-				<a href="/orbit/" class="primary">궤도 탐험에서 직접 보기 ↗</a>
-				<p class="model-note">
-					J2000부터 40년 범위의 근사 모형입니다. 기본 ‘시각적 강조’는 태양의 은하 이동 성분을 1/20로
-					줄이며, 설정에서 ‘실제 속도 비율’로 바꿀 수 있습니다. 현재 시각의 정밀한 관측 위치는
-					아닙니다.
-				</p>
+{#key article.slug}
+	<article class="wrap page-content" use:revealSourceReferences>
+		<header class="article-header reading">
+			<a class="text-link" href="/articles/">← 과학 이야기</a>
+			<p class="article-category">{article.category}</p>
+			<h1>{article.title}</h1>
+			<p class="intro">{article.intro}</p>
+		</header>
+		<div class="reading article-body">
+			{#each article.opening ?? [] as paragraph (paragraph)}<p>{paragraph}</p>{/each}
+			<p class="lead">{article.takeaway}</p>
+			{#if article.diagram === 'motion'}<MotionSpeeds sourceIds={article.sourceIds} />{/if}
+			<nav class="article-nav" aria-label="이 글의 순서">
+				<span class="contents-label">이 글의 순서</span>
+				<ol>
+					{#each article.sections as section, i (section.title)}<li>
+							<a href={`#question-${i + 1}`}
+								><span aria-hidden="true">0{i + 1}</span>{section.title}</a
+							>
+						</li>{/each}
+				</ol>
+			</nav>
+			{#if article.diagram === 'moon'}<MoonDistance
+					inArticle
+				/>{:else if article.diagram === 'atom'}<figure class="atom-figure">
+					<div class="atom-art"><Diagram kind="atom" /></div>
+					<strong>2a₀ ≈ 0.106 nm</strong>
+					<figcaption>
+						<ArticleDisclosure class="model-notes" label="모형 설명">
+							<p>
+								보어 반지름의 두 배를 기준 길이로 사용합니다. 상징적 도식이며 전자 궤도나 실제 크기
+								비례를 나타내지 않습니다.
+							</p>
+							<a href="#source-nist">NIST · 2022 CODATA ↗</a>
+						</ArticleDisclosure>
+					</figcaption>
+				</figure>{/if}{#each article.sections as section, i (section.title)}<section>
+					<h2 id={`question-${i + 1}`}>{section.title}</h2>
+					<p>{section.text}</p>
+					{#each section.paragraphs ?? [] as paragraph (paragraph)}<p>{paragraph}</p>{/each}
+					{#if section.keyPoint}<p class="key-point">{section.keyPoint}</p>{/if}
+					{#if section.visual === 'inertia'}<TrainInertia
+						/>{:else if section.visual === 'frames'}<MotionFrames />{/if}
+				</section>{/each}
+			<aside class="explorer-invitation">
+				<h2>직접 탐험해 보세요.</h2>
+				{#if article.diagram === 'motion'}
+					<p>
+						태양과 여덟 행성의 움직임을 궤도 탐험기에서 이어 보세요. ‘태양계’와 ‘은하 궤적’을 오가며
+						같은 운동의 다른 모습을 만날 수 있습니다.
+					</p>
+					<a href="/orbit/" class="primary">궤도 탐험에서 직접 보기 ↗</a>
+				{:else}
+					<p>
+						{article.diagram === 'moon'
+							? '지구와 달의 크기를 같은 눈금에서 비교해 보세요.'
+							: '원자 규모의 기준 길이와 탁구공의 크기를 눈금으로 비교해 보세요.'}
+					</p>
+					<a
+						href={`/scale/?object=${article.diagram === 'moon' ? 'earth' : 'atom'}`}
+						class="primary">크기 탐험으로 ↗</a
+					>
+				{/if}
 			</aside>
-		{/if}
-		<section class="article-sources">
-			<h2>자료 및 출처</h2>
-			<p class="note">
-				{article.sourceNote ?? '출처 수치를 사용한 환산과 비교는 A2O의 계산입니다.'}
-			</p>
-			<ol>
-				{#each article.sourceIds as id (id)}{@const source = sourceById(id)}
-					<li id={`source-${id}`}>
-						<a href={source.url}>{source.label} ↗</a>
-						<p>{source.basis}</p>
-						<small>확인일: {source.accessedAt}</small>
-					</li>{/each}
-			</ol>
-		</section>
-		<div class="next">
-			{#if article.diagram !== 'motion'}<h2>직접 눈금을 움직여 보세요.</h2>
-				<a href={`/scale/?object=${article.diagram === 'moon' ? 'earth' : 'atom'}`} class="primary"
-					>크기 탐험으로 ↗</a
-				>{:else}<h2>
-					다음 질문으로 이어 가세요.
-				</h2>{/if}{#each articles.filter((a) => a.slug !== article.slug) as other (other.slug)}<a
-					class="text-link"
-					href={`/articles/${other.slug}/`}>다음 이야기: {other.title} →</a
-				>{/each}
+			<section class="article-sources" aria-label="자료 및 출처">
+				<ArticleDisclosure class="sources-disclosure" label="자료 및 출처">
+					<p class="note">
+						{article.sourceNote ?? '출처 수치를 사용한 환산과 비교는 A2O의 계산입니다.'}
+					</p>
+					{#if article.diagram === 'motion'}
+						<p class="note">
+							궤도 탐험기는 J2000부터 40년 범위의 근사 모형입니다. 기본 ‘시각적 강조’는 태양의 은하
+							이동 성분을 1/20로 줄이며, 설정에서 ‘실제 속도 비율’로 바꿀 수 있습니다. 현재 시각의
+							정밀한 관측 위치는 아닙니다.
+						</p>
+					{/if}
+					<ol>
+						{#each article.sourceIds as id (id)}{@const source = sourceById(id)}
+							<li id={`source-${id}`} tabindex="-1">
+								<a href={source.url}>{source.label} ↗</a>
+								<p>{source.basis}</p>
+								<small>확인일: {source.accessedAt}</small>
+							</li>{/each}
+					</ol>
+				</ArticleDisclosure>
+			</section>
+			<div class="next">
+				<h2>다음 이야기</h2>
+				{#each articles.filter((a) => a.slug !== article.slug) as other (other.slug)}<a
+						class="text-link"
+						href={`/articles/${other.slug}/`}>{other.title} →</a
+					>{/each}
+			</div>
 		</div>
-	</div>
-</article>
+	</article>
+{/key}
 
 <style>
-	.article-details {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 6px 20px;
-		font-size: 13px;
-		padding-bottom: 16px;
-	}
 	.reading .key-point {
 		color: var(--ink);
 		font-weight: 650;
 	}
-	.reading .section-sources {
-		display: flex;
-		flex-wrap: wrap;
-		align-items: baseline;
-		gap: 3px 12px;
-		font-size: 12px;
-		line-height: 1.8;
-		margin-top: 16px;
-	}
-	.section-sources a {
-		padding-block: 6px;
-	}
 	.article-sources li {
 		scroll-margin-top: 30px;
 	}
-	.orbit-invitation {
-		border-block: 1px solid var(--line);
-		padding: 10px 0 26px;
-		margin-top: 42px;
+	.explorer-invitation {
+		margin-top: 56px;
 	}
-	.reading .model-note {
-		font-size: 13px;
-		line-height: 1.9;
-		margin-top: 20px;
+	.explorer-invitation h2 {
+		margin-top: 0;
 	}
 	.article-nav {
-		border-block: 1px solid var(--line);
-		padding-block: 22px;
-		margin-bottom: 32px;
+		margin-block: 36px 40px;
 	}
 	.article-header .article-category,
 	.contents-label {
@@ -218,7 +239,6 @@
 	}
 	.article-header {
 		padding-top: 38px;
-		border-bottom: 1px solid var(--line);
 	}
 	.article-header .article-category {
 		margin: 32px 0 0;
@@ -232,8 +252,9 @@
 		font-size: 19px;
 	}
 	.article-sources {
+		margin-top: 32px;
+		padding-top: 12px;
 		border-top: 1px solid var(--line);
-		margin-top: 50px;
 	}
 	.article-sources li {
 		font-size: 15px;
@@ -250,12 +271,10 @@
 		font-size: 13px;
 	}
 	.next {
-		border-top: 1px solid var(--line);
-		margin-top: 40px;
-		padding-top: 36px;
+		margin-top: 44px;
 	}
 	.next h2 {
-		margin-top: 12px;
+		margin-top: 0;
 	}
 	.next > .text-link {
 		display: block;
@@ -264,7 +283,7 @@
 	}
 	.atom-figure {
 		margin: 0;
-		padding: 24px;
+		padding: 26px;
 		background: var(--soft-teal);
 		border: 1px solid var(--line);
 		border-radius: 12px;
@@ -286,6 +305,9 @@
 		margin-top: 18px;
 	}
 	@media (max-width: 767px) {
+		.atom-figure {
+			padding: 20px;
+		}
 		.intro {
 			font-size: 17px;
 		}

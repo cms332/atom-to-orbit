@@ -1,3 +1,7 @@
+<script lang="ts">
+	import ArticleDisclosure from './ArticleDisclosure.svelte';
+</script>
+
 <figure class="inertia-figure">
 	<div class="panels">
 		{#each [false, true] as braking (braking)}
@@ -49,16 +53,20 @@
 		{/each}
 	</div>
 	<figcaption>
-		관성을 설명하는 정성적 비유입니다. 지구의 공전은 방향이 계속 바뀌는 가속 운동이라는 점에서 이
-		직선 운동과 다릅니다.
+		<ArticleDisclosure class="model-notes" label="모형 설명">
+			<p>
+				관성을 설명하는 정성적 비유입니다. 지구의 공전은 방향이 계속 바뀌는 가속 운동이라는 점에서
+				이 직선 운동과 다릅니다.
+			</p>
+			<a href="#source-motion-inertia">ESA · Space Science FAQ ↗</a>
+		</ArticleDisclosure>
 	</figcaption>
 </figure>
 
 <style>
 	.inertia-figure {
 		margin: 30px 0 40px;
-		padding: 24px 0;
-		border-block: 1px solid var(--line);
+		padding: 0;
 	}
 	.panels {
 		display: grid;

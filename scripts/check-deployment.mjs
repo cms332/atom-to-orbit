@@ -3,7 +3,7 @@ import { mkdir, writeFile } from 'node:fs/promises';
 import assert from 'node:assert/strict';
 
 const origin = process.env.A2O_BASE_URL || 'https://a2o.kr';
-const folder = 'artifacts/deployment';
+const folder = process.env.A2O_ARTIFACT_DIR || 'artifacts/deployment';
 await mkdir(folder, { recursive: true });
 const infoResponse = await fetch(`${origin}/build-info.json`);
 assert.equal(infoResponse.status, 200);
@@ -164,6 +164,36 @@ try {
 		}
 		await expect(page.locator('.article-sources li')).toHaveCount(10);
 		await expect(page.locator('canvas')).toHaveCount(0);
+		for (const [slug, sourceCount] of [
+			['why-earth-feels-still', 10],
+			['earth-moon', 3],
+			['atomic-scale', 2]
+		]) {
+			await page.goto(`${origin}/articles/${slug}/`);
+			await expect(page.locator('.article-header time')).toHaveCount(0);
+			await expect(page.locator('article summary').filter({ hasText: '자료 및 출처' })).toHaveCount(
+				1
+			);
+			await expect(page.locator('.section-sources, .explorer-invitation details')).toHaveCount(0);
+			const sources = page.locator('.sources-disclosure');
+			await expect(sources).not.toHaveAttribute('open');
+			await expect(sources.locator('li')).toHaveCount(sourceCount);
+			if (slug === 'why-earth-feels-still') {
+				const drawing = await page.locator('.motion-frames .drawing').boundingBox();
+				assert.ok(Math.abs(drawing.height / drawing.width - (310 / 640) * 1.7) < 0.01);
+				await expect(page.locator('.motion-speeds .source-ref')).toHaveText(['[1]', '[2]', '[3]']);
+				await page.getByRole('link', { name: '지구 자전 출처 1', exact: true }).click();
+				await expect(sources).toHaveAttribute('open');
+				await expect(page.locator('#source-motion-rotation')).toBeInViewport();
+				await sources.locator('summary').click();
+			}
+			await page
+				.locator('.explorer-invitation')
+				.evaluate((element) =>
+					window.scrollTo(0, element.getBoundingClientRect().top + window.scrollY - 24)
+				);
+			await page.screenshot({ path: `${folder}/${width}-${slug}-reading-flow.png` });
+		}
 		await page.goto(`${origin}/orbit/`);
 		await expect(page.getByTestId('orbit-explorer')).toHaveAttribute('data-status', 'ready');
 		const canvas = page.getByTestId('orbit-canvas');
