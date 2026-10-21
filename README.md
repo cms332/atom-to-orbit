@@ -1,6 +1,6 @@
 # A2O — Atom to Orbit
 
-한국어 독립 과학 아카이브의 로컬 첫 버전. Svelte 5, SvelteKit 2, TypeScript, Vite, Bun 및 `adapter-static`을 사용합니다.
+한국어 독립 과학 아카이브 [A2O — Atom to Orbit](https://a2o.kr). Svelte 5, SvelteKit 2, TypeScript, Vite, Bun 및 `adapter-static`을 사용합니다.
 
 `/orbit/`에는 자동으로 열리고 항상 움직이는 Three.js 궤도 탐험기가 있습니다. 기본 도크는 스토리·태양계·은하 궤적 세 조작으로 구성하며, 태양계는 수성·금성·지구·화성 중심으로 시작합니다. 태양·8행성 표면, 좌표계·속도 비교와 자동 진행하는 한국어 이야기를 제공합니다. [초기 설계](docs/ORBIT_EXPLORER_DESIGN.md), [간소화 재설계](docs/ORBIT_EXPLORER_REFINEMENT.md), 현재 [상시 움직임·자동 이야기](docs/ORBIT_CONTINUOUS_MOTION.md)를 참고합니다. 홈과 헤더는 크기 탐험하기 → 궤도 탐험하기 → 과학 이야기 읽기 순서입니다.
 
@@ -23,7 +23,9 @@ bun run test:e2e
 bun run preview --port 4173
 ```
 
-빌드 산출물은 `build/`입니다. 프리렌더된 HTML, 정적 데이터와 SVG로 구성되어 서버나 DB가 필요하지 않습니다. 빌드 후에는 기존 preview 프로세스를 재시작해야 새 파일명이 반영됩니다. 이 작업에는 공개 배포나 DNS 변경이 포함되지 않습니다.
+빌드 산출물은 `build/`입니다. 프리렌더된 HTML과 정적 자원으로 구성되어 애플리케이션 서버나 DB가 필요하지 않습니다. 빌드 후에는 기존 preview 프로세스를 재시작해야 새 파일명이 반영됩니다.
+
+2026-10-21 소유자 승인으로 Ubuntu의 A2O 전용 컨테이너에 공개 배포했습니다. 기존 HGI와 다른 서비스는 유지하며, DNS는 소유자가 관리합니다. 배포·검증·복구 명령과 구조는 [배포 운영 문서](docs/DEPLOYMENT.md)를 참고합니다.
 
 ## 페이지
 
@@ -45,7 +47,7 @@ bun run preview --port 4173
 - 문구 변경 후 웹폰트 재생성: `python -m pip install fonttools brotli`, `python scripts/subset-font.py`. 원본은 `scripts/fonts/`, 현재 문구로 만든 웹 서브셋은 `static/fonts/`에 있습니다. OFL과 Reserved Font Name에 맞춰 파생 폰트의 내부 이름을 `A2O Sans Subset`으로 변경했습니다.
 - 공유 이미지 재생성: `node scripts/render-social.mjs`. 기존 HTML 참고 화면 캡처도 `artifacts/reference-desktop.png`에 저장합니다.
 - CSS는 페이지별 작은 스타일을 프리렌더 HTML에 인라인합니다. 루트 도메인에서 서비스하는 구조이므로 ESLint의 base-path `resolve()` 강제 규칙만 제외했습니다.
-- 정적 호스팅 시 알 수 없는 경로에 `404.html`을 **404 상태 코드로** 반환하도록 설정해야 합니다. 이 저장소에서는 호스팅 설정을 적용하거나 배포하지 않았습니다.
+- 정적 호스팅 시 알 수 없는 경로에 `404.html`을 **404 상태 코드로** 반환해야 합니다. 현재 Ubuntu Nginx 설정과 공개 응답에서 이를 검증했습니다.
 
 실제 검사 결과와 스크린샷 목록은 `docs/IMPLEMENTATION_REPORT.md`에서 확인합니다. Lighthouse는 로컬 진단이며 실제 이용자의 Core Web Vitals를 입증하지 않습니다.
 
