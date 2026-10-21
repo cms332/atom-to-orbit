@@ -62,8 +62,15 @@ NPM 내부 모듈 API는 현재 설치 버전에서 검증한다. NPM 업그레�
 
 ## 움직임 기사 공개 게시 — 2026-10-21
 
-- 현재 릴리스: `20261021T035437Z`, 직전 정상 릴리스: `20261021T023538Z`. 실제 배포 소스: `1d61194e480acc4320006ec3bda7a2d4c2ba9bf0`.
+- 기사 최초 게시 릴리스: `20261021T035437Z`, 당시 직전 정상 릴리스: `20261021T023538Z`. 실제 배포 소스: `1d61194e480acc4320006ec3bda7a2d4c2ba9bf0`.
 - 공개 기사: `https://a2o.kr/articles/why-earth-feels-still/`. 홈·목록·필터·사이트맵에 연결했다. 기사에는 별도 WebGL 엔진을 추가하지 않고 기존 궤도 계산을 재사용한 SVG를 제공한다.
 - Linux 타입 검사·단위 테스트 49개·정적 빌드·버전 및 자원 검사가 통과했다. 기존 컨테이너 24개와 프록시 설정 6개의 보존 감사도 통과했다. 전용 A2O 호스트만 전환했으며 DNS는 변경하지 않았다.
 - 공개 HTTPS 검증: PC 1440×1000 / 모바일 360×800에서 새 기사·Article 메타데이터·기준계 전환·상대 위치 불변성과 기존 탐험기/모바일 설정 동작이 정상이다. 검사 경로 9개, 사이트맵의 실제 페이지 7개가 정상 응답한다. 페이지 오류·자원 요청 실패가 없고 이전 모듈 주소 30개와 갱신된 폰트도 정상이다.
 - 증거는 `artifacts/motion-article/public-verification.json`, `public-release.json`, `public-desktop/mobile-opening.png`, `public-desktop/mobile-galactic.png`에 보관한다. 제작·과학·디자인·로컬 검증은 `docs/content/why-earth-feels-still/IMPLEMENTATION.md`에 기록했다.
+
+## 기사 최종 보완 배포 — 2026-10-21
+
+- 현재 릴리스: `20261021T040426Z`, 직전 정상 릴리스: `20261021T035437Z`. 실제 배포 소스: `93a4d8c8396ec4f4df6964101981d8a652368e3f`.
+- 폰트 CSS와 HTML 프리로드를 같은 내용 해시로 맞추고 공유용 Twitter 메타데이터를 명시했다. 최종 폰트 버전은 `a2e149c087ce`, 크기는 125,828바이트다. 브라우저에서 한 개의 폰트 URL만 로드하는 것을 검증했다.
+- Linux 타입 검사·49개 단위 테스트·정적 빌드·정상 응답 검사와 기존 컨테이너 24개/프록시 설정 6개 보존 감사가 통과했다. 공개 PC·모바일 검증도 9개 HTTP 경로 및 새 기사·공유 정보·폰트 단일 로딩·도식·기존 탐험기/설정까지 통과했다. 페이지 오류와 자원 요청 실패가 없다.
+- `artifacts/motion-article/public-*`는 이 최종 버전을 기록한다. 최초 게시 증거는 `initial-public-verification.json`, `initial-public-release.json`으로 별도 보존했다.

@@ -56,3 +56,14 @@
 - 공개 증거: `artifacts/motion-article/public-verification.json`, `public-release.json`, `public-desktop/mobile-opening.png`, `public-desktop/mobile-galactic.png`. 실제 공개 모바일 캡처도 직접 확인했다.
 
 최종 검수에서 폰트 프리로드 주소를 보완하고 Twitter 제목·설명·카드·이미지를 명시했다. 실제 폰트 요청 주소가 하나이며 프리로드와 일치하는 검사, 공유 메타데이터 검사를 추가한 기사 전용 브라우저 재검증도 PC/모바일 **8 passed / 0 failed / 0 flaky** (20.0초)다. 타입 검사·린트·빌드도 통과했다. 보고서는 `final-local-results.json`이다.
+
+최종 공개 릴리스는 `20261021T040426Z`이며 실제 소스는 `93a4d8c8396ec4f4df6964101981d8a652368e3f`다. 직전 정상 릴리스는 최초 기사 버전 `20261021T035437Z`다. Linux 검사·49개 테스트·빌드와 기존 24개 컨테이너/6개 프록시 보존 감사가 모두 통과했다. 최종 공개 PC/모바일 검사에서 Twitter 정보와 버전화된 폰트 단일 요청, 기사·도식·기존 탐험기/설정까지 정상이며 페이지 오류·자원 요청 실패가 없다. 폰트 버전 `a2e149c087ce`, 125,828바이트를 확인했다. 최종 공개 모바일 캡처도 직접 확인했다. `public-*` 보고서와 이미지는 이 버전이며, 최초 공개 보고서는 `initial-public-*`로 보존한다.
+
+## 변경 파일
+
+- 원고·자료: `src/lib/content/articles.ts`, `motion-article.ts`, `src/lib/data/science.ts`, `motion.ts`.
+- 기사·연결 화면: `src/routes/articles/[slug]/+page.svelte`, `src/routes/articles/+page.svelte`, `src/routes/+page.svelte`, `src/lib/components/ArticleCard.svelte`, `PageMeta.svelte`.
+- 원본 도해와 비교: `src/lib/components/MotionThumbnail.svelte`, `MotionSpeeds.svelte`, `TrainInertia.svelte`, `MotionFrames.svelte`, `src/lib/utils/motion-scene.ts`.
+- 폰트: `scripts/subset-font.py`, `src/lib/styles.css`, `src/app.html`, `static/fonts/A2OSans-Subset.woff2`.
+- 검증: `src/lib/utils/motion-scene.test.ts`, `tests/motion-article.spec.ts`, `tests/site.spec.ts`, `scripts/check-deployment.mjs`.
+- 문서·원문 보관: `.prettierignore`, `README.md`, `docs/DEPLOYMENT.md`, `docs/A2O_DECISIONS_AND_PROGRESS.md`, 이 문서와 `reference/`의 원문 세 파일.
