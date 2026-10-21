@@ -44,6 +44,22 @@ try {
 		const response = await fetch(`http://${target}:8080/healthz`);
 		if (!response.ok || (await response.json()).release !== target.slice(4))
 			throw new Error('Target health/version mismatch');
+		for (const path of [
+			'/',
+			'/scale/',
+			'/orbit/',
+			'/articles/',
+			'/fonts/A2OSans-Subset.woff2',
+			'/orbit/textures/earth.webp'
+		]) {
+			const asset = await fetch(`http://${target}:8080${path}`);
+			if (!asset.ok) throw new Error(`Target asset unavailable: ${path} (${asset.status})`);
+			if (path === '/') {
+				const module = (await asset.text()).match(/\/_app\/immutable\/[^"'\s]+\.js/)?.[0];
+				if (!module || !(await fetch(`http://${target}:8080${module}`)).ok)
+					throw new Error('Target module unavailable');
+			}
+		}
 		if (host)
 			await proxy.update(access, {
 				id: host.id,
