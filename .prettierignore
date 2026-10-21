@@ -1,0 +1,15 @@
+node_modules
+.svelte-kit
+build
+artifacts
+bun.lock
+A2O_HOMEPAGE_REFERENCE.html
+A2O_MASTER_GUIDE.md
+A2O_DECISIONS_AND_PROGRESS.md
+CODEX_START_PROMPT.md
+AGENTS.md
+docs/A2O_MASTER_GUIDE.md
+.tmp
+docs/reference-assets/
+static/fonts/OFL.txt
+static/licenses/

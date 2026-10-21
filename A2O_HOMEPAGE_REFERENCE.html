@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="color-scheme" content="light" />
+  <title>A2O — Atom to Orbit | Editorial Observatory visual reference</title>
+  <meta name="description" content="A2O 시각 디자인 참고용 독립 HTML. 실제 공개용 사이트가 아닙니다." />
+  <style>
+    :root{
+      --paper:#F7F8F4;--surface:#FFFFFF;--ink:#162A33;--muted:#586B74;--line:#D9E2E0;
+      --teal:#286875;--tint:#E8F0EF;--copper:#D6A16A;--deep:#102832;--deep2:#183944;
+      --grid:#385461;--light:#F4F6F2;--light-muted:#C2D2D5;--radius:18px;
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;background:var(--paper);color:var(--ink);font-family:"SUIT Variable", "SUIT", "Pretendard", system-ui, -apple-system,"Malgun Gothic",sans-serif; font-weight:400;-webkit-font-smoothing:antialiased}
+    a{color:inherit;text-decoration:none}
+    button,input{font:inherit}
+    button,a,input{outline-offset:4px}
+    :focus-visible{outline:3px solid #3B8295}
+    .visually-hidden{position:absolute;width:1px;height:1px;padding:0;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+    .wrap{width:min(calc(100% - 96px),1240px);margin-inline:auto}
+    .debug-pill{display:inline-flex;align-items:center;gap:9px;color:#6F7E82;font-size:10px;font-weight:700;letter-spacing:.1em}
+    .debug-pill::before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:#C68E58}
+    .masthead{height:82px;background:rgba(247,248,244,.95);border-bottom:1px solid var(--line);display:flex;align-items:center;position:relative;z-index:5}
+    .head-inner{display:flex;align-items:center;justify-content:space-between;gap:24px}
+    .wordmark{display:flex;align-items:center;gap:14px;min-width:185px}
+    .wordmark>span{font-size:31px;letter-spacing:-.075em;font-weight:830;line-height:1}
+    .mark-sub{font:700 10px/1.3 system-ui,sans-serif;letter-spacing:.11em;color:var(--muted);border-left:1px solid #C5D1CE;padding-left:13px}
+    .head-nav{display:flex;gap:34px;align-items:center;font-size:13px;font-weight:650;color:#4E6068}
+    .head-nav a{padding:12px 0;transition:color .15s}
+    .head-nav a:hover,.head-nav .selected{color:var(--teal)}
+    .head-nav .selected{position:relative}
+    .head-nav .selected::after{content:"";position:absolute;bottom:6px;left:0;right:0;height:2px;background:var(--teal)}
+    .head-right{display:flex;align-items:center;gap:11px}
+    .head-tag{font:600 10px system-ui,sans-serif;letter-spacing:.1em;color:var(--muted);padding-left:21px;border-left:1px solid var(--line)}
+    .hero{padding:96px 0 96px;display:grid;grid-template-columns:minmax(0,.93fr) minmax(0,1.07fr);gap:58px;align-items:center;min-height:724px}
+    .eyebrow{display:flex;align-items:center;gap:12px;font:700 11px system-ui,sans-serif;letter-spacing:.125em;color:var(--teal)}
+    .eyebrow .dash{width:32px;height:1px;background:var(--teal)}
+    .hero h1{margin:31px 0 24px;font-size:clamp(49px,5.4vw,76px);font-weight:810;line-height:1.17;letter-spacing:-.068em;word-break:keep-all}
+    .hero h1 em{font-style:normal;position:relative;white-space:nowrap}
+    .hero h1 em::after{content:"";position:absolute;left:0;right:0;bottom:-9px;height:5px;background:var(--copper);transform:rotate(-1deg);border-radius:7px}
+    .hero p{font-size:17px;line-height:1.86;color:var(--muted);max-width:425px;word-break:keep-all;margin:0}
+    .hero-cta{display:flex;align-items:center;gap:24px;margin-top:40px}
+    .primary{min-height:54px;padding:0 23px;background:var(--ink);color:white;border-radius:7px;display:inline-flex;align-items:center;gap:30px;font-size:14px;font-weight:700;white-space:nowrap}
+    .primary span{font-size:20px;font-weight:400}
+    .secondary{font-size:14px;font-weight:650;border-bottom:1px solid #8CA5A7;padding:14px 0 6px;color:#315C64}
+    .hero-note{display:flex;gap:13px;align-items:center;margin-top:64px;color:#819196;font:600 11px system-ui,sans-serif;letter-spacing:.07em}
+    .hero-note::before{content:"";display:block;width:48px;height:1px;background:#A8BAB9}
+    .panel{height:550px;border-radius:20px;position:relative;overflow:hidden;padding:31px 33px 27px;background:radial-gradient(circle at 58% 48%,#1C404A 0%,#102832 57%,#102630 100%);color:var(--light);border:1px solid #214651;box-shadow:0 24px 48px rgba(24,47,52,.08)}
+    .panel::before{content:"";pointer-events:none;position:absolute;inset:0;background-image:linear-gradient(to right,rgba(186,217,218,.045) 1px,transparent 1px),linear-gradient(to bottom,rgba(186,217,218,.045) 1px,transparent 1px);background-size:38px 38px;mask-image:linear-gradient(to bottom,transparent 3%,#000 30%,#000 78%,transparent)}
+    .panel>*{position:relative;z-index:1}
+    .panel-header{display:flex;justify-content:space-between;gap:12px;align-items:start;color:var(--light-muted);font:700 10px system-ui,sans-serif;letter-spacing:.13em}
+    .panel-header b{color:#E4C397;font-weight:700}
+    .diagram{height:291px;display:grid;place-items:center;position:relative}
+    .diagram svg{width:min(100%,440px);height:260px;overflow:visible}
+    .panel-nums{display:flex;justify-content:space-between;align-items:end;gap:16px;margin-bottom:24px}
+    .panel-label{display:block;font-size:11px;font-weight:650;color:var(--light-muted);letter-spacing:.025em;margin-bottom:10px}
+    .panel-object{font-size:24px;letter-spacing:-.04em;font-weight:750;line-height:1.15}
+    .panel-metric{text-align:right}
+    .panel-number{font:550 28px/1.1 ui-monospace,SFMono-Regular,Consolas,monospace;letter-spacing:-.06em;color:#E6BB82;white-space:nowrap}
+    .panel-unit{color:var(--light-muted);font-size:11px;margin-top:8px}
+    .scale-input{display:block;width:100%;accent-color:#DBAF77;cursor:pointer;height:20px;margin:0}
+    .scale-ticks{display:flex;justify-content:space-between;color:#8DA8AE;font:600 10px ui-monospace,monospace;letter-spacing:.03em;padding-top:7px}
+    .panel-foot{margin-top:14px;display:flex;justify-content:space-between;gap:15px;align-items:center;color:#9EB5B9;font-size:10px}
+    .panel-foot .gold{color:#E6BB82}
+    .section-line{border-top:1px solid var(--line)}
+    .section-head{display:flex;justify-content:space-between;align-items:end;gap:30px;padding:102px 0 37px}
+    .section-marker{font:700 11px system-ui,sans-serif;letter-spacing:.14em;color:var(--teal);margin-bottom:17px}
+    .section-head h2{font-size:clamp(32px,3.1vw,43px);letter-spacing:-.06em;line-height:1.3;margin:0;word-break:keep-all}
+    .section-head p{font-size:14px;line-height:1.85;color:var(--muted);max-width:370px;margin:0 0 4px}
+    .topic-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+    .topic{border:1px solid var(--line);background:#FFFFFF;border-radius:11px;padding:22px 22px 26px;overflow:hidden;position:relative;min-height:355px;transition:transform .16s,box-shadow .16s}
+    .topic:hover{transform:translateY(-3px);box-shadow:0 16px 35px rgba(17,56,66,.06)}
+    .topic-top{display:flex;justify-content:space-between;align-items:center;font:700 10px system-ui,sans-serif;letter-spacing:.11em;color:#687C80}
+    .topic-top span:last-child{font-size:18px;color:#607B81}
+    .topic-art{height:170px;display:grid;place-items:center}
+    .topic-art svg{width:100%;height:146px}
+    .topic small{color:var(--teal);font:700 10px system-ui,sans-serif;letter-spacing:.08em}
+    .topic h3{font-size:24px;font-weight:750;letter-spacing:-.06em;margin:8px 0 7px}
+    .topic p{font-size:13px;color:var(--muted);line-height:1.65;margin:0;word-break:keep-all}
+    .featured{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.06fr);gap:70px;align-items:center;padding:120px 0 110px}
+    .featured-copy h2{font-size:clamp(32px,3.8vw,52px);letter-spacing:-.063em;line-height:1.31;margin:13px 0 20px;word-break:keep-all}
+    .featured-copy p{font-size:16px;color:var(--muted);line-height:1.9;max-width:470px}
+    .feature-link{display:inline-flex;gap:36px;border-bottom:1px solid var(--ink);padding:11px 0;font-size:14px;font-weight:720;margin-top:17px}
+    .feature-visual{background:#E8EFEE;border-radius:12px;padding:23px 28px 22px;position:relative;min-height:350px;overflow:hidden;border:1px solid #D3E0DD}
+    .feature-visual::before{content:"";position:absolute;inset:0;background:linear-gradient(transparent 99%,#B5CBC6 100%),linear-gradient(90deg,transparent 99%,#B5CBC6 100%);background-size:34px 34px;opacity:.32}
+    .feature-top{font:700 10px system-ui,sans-serif;color:#4E6A6C;letter-spacing:.1em;position:relative;display:flex;justify-content:space-between}
+    .feature-visual svg{width:100%;height:245px;position:relative}
+    .feature-caption{font-size:11px;color:#617E7C;position:relative;margin-top:0}
+    .articles-wrap{background:#F0F3EF;border-top:1px solid #DCE5DF;border-bottom:1px solid #DCE5DF;padding-bottom:105px}
+    .articles-wrap .section-head{padding-top:88px}
+    .article-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:28px}
+    .article{border-top:1px solid #B8CDCA;padding:19px 0 0;min-width:0}
+    .article .kicker{font:700 10px system-ui,sans-serif;letter-spacing:.12em;color:var(--teal)}
+    .article h3{font-size:22px;letter-spacing:-.055em;line-height:1.43;margin:19px 0 12px}
+    .article p{font-size:14px;line-height:1.8;color:var(--muted);margin:0}
+    .article .index{display:block;font-size:11px;color:#8E9D9C;margin-top:20px}
+    .method{display:grid;grid-template-columns:1fr 1fr;gap:80px;padding:100px 0 110px;align-items:start}
+    .method h2{font-size:35px;letter-spacing:-.06em;line-height:1.4;margin:0}
+    .method p{font-size:15px;color:var(--muted);line-height:1.88;margin:2px 0 0}
+    .method-list{border-top:1px solid var(--line)}
+    .method-item{padding:16px 0;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:14px;font-size:13px;font-weight:650}
+    .method-item span{color:var(--teal);font:650 11px ui-monospace,monospace}
+    footer{background:var(--deep);color:#F1F7F3;padding:51px 0 31px}
+    .footer-top{display:flex;justify-content:space-between;gap:40px}
+    .footer-logo{font-size:36px;letter-spacing:-.08em;font-weight:800}
+    .footer-title{font-size:13px;color:#BBD0D0;margin:5px 0 0}
+    .footer-note{font-size:12px;color:#BBD0D0;line-height:1.8;max-width:440px}
+    .footer-bottom{border-top:1px solid #31515B;margin-top:43px;padding-top:19px;color:#8FB0B1;font:600 10px system-ui,sans-serif;display:flex;justify-content:space-between;gap:14px;letter-spacing:.06em}
+    .mobile-menu{display:none}
+    @media(max-width:1100px){
+      .wrap{width:min(calc(100% - 64px),1240px)}
+      .head-nav{gap:18px;font-size:12px}.head-tag{display:none}
+      .hero{gap:32px;grid-template-columns:minmax(0,.95fr) minmax(0,1.05fr);min-height:650px;padding:65px 0}
+      .hero h1{font-size:clamp(43px,5.2vw,67px)}
+      .panel{height:525px;padding:26px}.diagram{height:270px}.panel-number{font-size:23px}
+      .featured{gap:35px}
+    }
+    @media(max-width:780px){
+      .wrap{width:calc(100% - 40px)}
+      .masthead{height:66px}.head-nav{display:none}.mobile-menu{display:inline-flex;border:1px solid var(--line);background:none;padding:7px 12px;color:var(--ink);font-weight:700;font-size:12px;border-radius:6px}
+      .wordmark>span{font-size:27px}.mark-sub{font-size:9px}
+      .hero{display:block;min-height:unset;padding:69px 0 75px}.hero h1{font-size:clamp(39px,9.6vw,58px);margin:27px 0 23px}.hero p{font-size:16px}.hero-cta{margin-top:30px;gap:18px}.primary{min-height:51px;padding:0 18px;gap:17px;font-size:13px}.secondary{font-size:13px}
+      .hero-note{margin:38px 0 26px}.panel{height:auto;min-height:495px;padding:23px 19px 22px;border-radius:15px}.diagram{height:243px}.diagram svg{height:220px}.panel-object{font-size:21px}.panel-number{font-size:19px}.panel-foot{font-size:9px}
+      .section-head{display:block;padding:73px 0 26px}.section-head h2{font-size:34px}.section-head p{margin-top:17px;max-width:none}.topic-grid{grid-template-columns:1fr;gap:13px}.topic{min-height:275px;padding:18px 20px 21px}.topic-art{height:116px}.topic-art svg{height:115px}.topic h3{font-size:22px}
+      .featured{display:flex;flex-direction:column;gap:28px;align-items:stretch;padding:80px 0}.featured-copy h2{font-size:36px}.featured-copy p{font-size:15px}.feature-visual{min-height:310px;padding:19px}
+      .articles-wrap{padding-bottom:70px}.articles-wrap .section-head{padding-top:73px}.article-grid{grid-template-columns:1fr;gap:29px}.article h3{margin-top:12px;font-size:21px}.article .index{margin-top:12px}
+      .method{display:block;padding:76px 0}.method h2{font-size:32px}.method p{margin-top:19px;margin-bottom:27px}.footer-top{display:block}.footer-note{margin-top:19px}.footer-bottom{display:block;line-height:1.9}
+    }
+    @media(max-width:390px){.mark-sub{font-size:8px}.hero-cta{gap:12px}.panel-number{font-size:17px}.panel-object{font-size:20px}.panel-nums{gap:8px}}
+    @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
+  </style>
+</head>
+<body>
+  <!-- THIS IS A LOCAL CONCEPT ONLY. Use the master guide for the production implementation. -->
+  <header class="masthead" id="top">
+    <div class="wrap head-inner">
+      <a href="#top" class="wordmark" aria-label="A2O — Atom to Orbit, 처음으로">
+        <span>A2O</span><span class="mark-sub">ATOM<br>TO ORBIT</span>
+      </a>
+      <nav class="head-nav" aria-label="디자인 참고용 탐색">
+        <a class="selected" href="#explore">스케일 탐험</a><a href="#stories">과학 이야기</a><a href="#method">방법과 출처</a><a href="#about">A2O 소개</a>
+      </nav>
+      <div class="head-right"><span class="head-tag">INDEPENDENT SCIENCE ATLAS</span><button type="button" class="mobile-menu" id="menuToggle" aria-expanded="false" aria-controls="mobileNav">메뉴</button></div>
+    </div>
+  </header>
+  <nav id="mobileNav" aria-label="모바일 탐색" hidden style="background:#fff;border-bottom:1px solid #D9E2E0;padding:14px 20px;line-height:2.6;font-size:14px">
+    <a href="#explore">스케일 탐험</a> · <a href="#stories">과학 이야기</a> · <a href="#method">방법과 출처</a> · <a href="#about">A2O 소개</a>
+  </nav>
+
+  <main>
+    <section class="hero wrap" aria-label="Atom to Orbit 소개">
+      <div class="hero-copy">
+        <div class="eyebrow"><span class="dash"></span> SCIENCE AT EVERY SCALE</div>
+        <h1>모든 크기에는<br><em>이야기가 있다.</em></h1>
+        <p>눈에 보이지 않는 원자부터 거대한 천체까지.<br>세상의 크기와 거리를 숫자와 시각적 비교로 이해하는 독립 과학 아카이브.</p>
+        <div class="hero-cta"><a href="#explore" class="primary">크기 탐험하기 <span>↗</span></a><a href="#stories" class="secondary">과학 이야기 읽기 →</a></div>
+        <div class="hero-note">A2O / ATOM TO ORBIT <span>—</span> 2026</div>
+      </div>
+      <div class="panel" id="explore" aria-label="인터랙티브 크기 비교 미리보기">
+        <div class="panel-header"><span>01&nbsp; / &nbsp;SCALE EXPLORER</span><span><b>●</b> &nbsp; REPRESENTATIVE SIZE</span></div>
+        <div class="diagram">
+          <svg viewBox="0 0 440 260" role="img" aria-labelledby="diagram-title">
+            <title id="diagram-title">측정기 같은 눈금과 원형 다이어그램으로 표현한 상징적 비율 도식</title>
+            <g stroke="#4C6871" fill="none" opacity=".6"><path d="M8 130H432" stroke-dasharray="3 5"/><path d="M220 6V254" stroke-dasharray="3 5"/><circle cx="220" cy="130" r="116" stroke-width=".65"/><circle cx="220" cy="130" r="90" stroke-width=".75"/><circle cx="220" cy="130" r="64" stroke-width=".75"/></g>
+            <g stroke="#6E9FA4" stroke-width=".8" fill="none" opacity=".65"><path d="M220 18V242M108 130H332"/><path d="M58 30l17 17M360 212l17 17"/></g>
+            <circle cx="220" cy="130" r="72" stroke="#E6BC86" fill="none" stroke-width="1.4" stroke-dasharray="2 6"/>
+            <ellipse cx="220" cy="130" rx="123" ry="45" stroke="#7FA9A9" stroke-width="1" fill="none" transform="rotate(-26 220 130)"/>
+            <ellipse cx="220" cy="130" rx="105" ry="80" stroke="#A7B8AE" stroke-width=".8" fill="none" transform="rotate(31 220 130)" opacity=".7"/>
+            <circle cx="220" cy="130" r="26" fill="#C78F5E" opacity=".2"/><circle cx="220" cy="130" r="17" fill="#D9A970"/><circle cx="220" cy="130" r="9" fill="#E9CF9E"/>
+            <circle cx="113" cy="151" r="4" fill="#88B6B3"/><circle cx="326" cy="86" r="4" fill="#E5B783"/>
+            <g font-family="ui-monospace,monospace" font-size="9" fill="#78949A"><text x="18" y="17">+Y</text><text x="404" y="244">+X</text><text x="238" y="20">MEASUREMENT</text><text x="234" y="244">NOT TO SCALE</text></g>
+          </svg>
+        </div>
+        <div class="panel-nums"><div><span class="panel-label">선택한 대상 / OBJECT</span><div id="objectName" class="panel-object">지구의 평균 지름</div></div><div class="panel-metric"><span class="panel-label" id="measureKind">대표 길이</span><div id="objectValue" class="panel-number">1.27 × 10⁷ m</div><div id="objectDetail" class="panel-unit">약 12,742 km</div></div></div>
+        <label class="visually-hidden" for="scaleRange">크기 비교 항목 선택</label>
+        <input type="range" min="-10" max="10" step="0.1" value="7.1" id="scaleRange" class="scale-input" aria-valuetext="10의 7.1제곱 미터 부근: 지구의 평균 지름, 약 12,742 km" />
+        <div class="scale-ticks"><span>10⁻¹⁰ m</span><span>LOG₁₀ / METER</span><span>10¹⁰ m</span></div>
+        <div class="panel-foot"><span>← 좌우 화살표로 선택 가능</span><span class="gold">※ 그림은 실제 크기 비례가 아닌 상징적 도식</span></div>
+      </div>
+    </section>
+
+    <section class="section-line" aria-label="탐험 주제"><div class="wrap"><div class="section-head"><div><div class="section-marker">DISCOVER / 001</div><h2>작은 세계에서<br>거대한 우주까지.</h2></div><p>익숙한 사물을 새로운 눈금에서 바라보는 순간, 우리가 사는 세계의 규모가 조금 다르게 보이기 시작합니다.</p></div>
+      <div class="topic-grid">
+        <article class="topic"><div class="topic-top"><span>01 / MICROSCOPIC</span><span>↗</span></div><div class="topic-art"><svg viewBox="0 0 330 146" role="img" aria-label="원자와 작은 원들을 표현한 미시 세계 선 도식"><g fill="none" stroke="#6B959A"><circle cx="159" cy="72" r="42"/><circle cx="159" cy="72" r="25" stroke-dasharray="2 4"/><ellipse cx="159" cy="72" rx="91" ry="24" transform="rotate(-24 159 72)"/><ellipse cx="159" cy="72" rx="81" ry="31" transform="rotate(36 159 72)"/></g><g fill="#D5A16C"><circle cx="159" cy="72" r="8"/><circle cx="78" cy="103" r="4"/></g><g fill="#2F7478"><circle cx="240" cy="42" r="4"/><circle cx="260" cy="102" r="2.5"/></g></svg></div><small>10⁻¹⁰ — 10⁻³ m</small><h3>미시 세계</h3><p>원자와 세포, 눈에 보이지 않는 크기를 숫자로 이해하기.</p></article>
+        <article class="topic"><div class="topic-top"><span>02 / LIVING EARTH</span><span>↗</span></div><div class="topic-art"><svg viewBox="0 0 330 146" role="img" aria-label="지구와 주변 눈금의 과학 일러스트"><g fill="none" stroke="#96B0B0" stroke-width="1"><circle cx="165" cy="73" r="63" stroke-dasharray="2 5"/><circle cx="165" cy="73" r="52"/><circle cx="165" cy="73" r="46" stroke="#4F8B91"/><path d="M105 73H225M165 15V132" stroke-dasharray="3 5"/><ellipse cx="165" cy="73" rx="25" ry="46"/><ellipse cx="165" cy="73" rx="46" ry="18"/></g><g fill="#2B7280" opacity=".65"><path d="M132 48l27-11 9 12-11 19-18-5-6 20-17-12zM168 87l21-12 18 11-5 18-28 4z"/></g><path d="M225 22h22v23" fill="none" stroke="#C9915D" stroke-width="2"/></svg></div><small>10⁻² — 10⁸ m</small><h3>지구와 생명</h3><p>사람의 몸에서 대륙과 행성까지, 친숙한 세계를 다시 보기.</p></article>
+        <article class="topic"><div class="topic-top"><span>03 / COSMIC SCALE</span><span>↗</span></div><div class="topic-art"><svg viewBox="0 0 330 146" role="img" aria-label="여러 궤도와 중심 천체를 나타낸 선 도식"><g stroke="#7A9DA1" fill="none"><circle cx="166" cy="74" r="42"/><circle cx="166" cy="74" r="63" stroke-dasharray="3 5"/><ellipse cx="166" cy="74" rx="116" ry="42" transform="rotate(-15 166 74)"/><ellipse cx="166" cy="74" rx="105" ry="60" transform="rotate(35 166 74)"/></g><circle cx="166" cy="74" r="14" fill="#D9A66C"/><circle cx="53" cy="102" r="5" fill="#3D838A"/><circle cx="240" cy="26" r="5" fill="#3D838A"/><circle cx="282" cy="91" r="2" fill="#3D838A"/></svg></div><small>10⁷ — 10¹⁶ m+</small><h3>태양계와 우주</h3><p>행성의 크기, 천체 사이의 거리, 빛의 속도를 체감하기.</p></article>
+      </div>
+    </div></section>
+
+    <section class="wrap featured" id="stories"><div class="featured-copy"><div class="section-marker">FEATURED EXPLANATION / 001</div><h2>지구와 달 사이에는<br>지구가 몇 개나<br>들어갈까?</h2><p>평균 약 38만 4,400km. 머릿속에 그리기 어려운 거리도 실제 크기와 비교하면 전혀 다른 이야기가 됩니다.</p><div class="feature-link">대표적인 거리 비교 살펴보기 <span>↗</span></div></div><div class="feature-visual"><div class="feature-top"><span>EARTH ↔ MOON</span><span>DISTANCE / KM</span></div><svg viewBox="0 0 520 245" role="img" aria-label="지구와 달 사이의 평균 거리를 나타낸 설명용 도식, 비율은 정확하지 않음"><g fill="none" stroke="#A7C0BE"><path d="M24 130H496" stroke-dasharray="4 6"/><path d="M81 180V203H444V180"/><path d="M81 190l10-6M444 190l-10-6"/></g><circle cx="92" cy="120" r="59" fill="#397987"/><circle cx="92" cy="120" r="55" fill="none" stroke="#80ADAB"/><path d="M72 84l29-13 17 22-13 21-23-3-10 21-22-11zM95 132l29-7 11 23-21 21-23-12z" fill="#6AA79C"/><circle cx="445" cy="120" r="16" fill="#C8C5B5"/><circle cx="445" cy="120" r="16" fill="none" stroke="#8CA3A1"/><g fill="#51737C" font-family="ui-monospace,monospace" font-size="10"><text x="63" y="47">EARTH</text><text x="427" y="80">MOON</text><text x="192" y="184" font-size="14" font-weight="bold">384,400 km</text><text x="215" y="205">AVERAGE</text></g></svg><div class="feature-caption">자료: NASA Earth Facts · 평균 거리 / 설명용 도식이며 실제 비율은 아님</div></div></section>
+
+    <section class="articles-wrap"><div class="wrap"><div class="section-head"><div><div class="section-marker">FIELD NOTES / 002</div><h2>세상의 규모를<br>읽는 방법.</h2></div><p>하나의 질문에서 출발하는 짧고 정확한 과학 이야기. 이 영역의 제목은 향후 함께 작성할 콘텐츠 기획 예시입니다.</p></div><div class="article-grid"><article class="article"><div class="kicker">MICRO / ARTICLE PLAN 01</div><h3>원자는 대체<br>얼마나 작을까?</h3><p>밀리미터와 나노미터 사이에 펼쳐지는 익숙하지 않은 숫자의 세계.</p><span class="index">CONTENT PLAN / 준비 중</span></article><article class="article"><div class="kicker">EARTH / ARTICLE PLAN 02</div><h3>머리카락과<br>미세먼지의 크기 차이</h3><p>우리의 감각으로 비교하기 어려운 크기를 한눈에 읽는 눈금.</p><span class="index">CONTENT PLAN / 준비 중</span></article><article class="article"><div class="kicker">COSMOS / ARTICLE PLAN 03</div><h3>광년은 시간일까,<br>거리일까?</h3><p>우주를 이해할 때 반드시 알아야 하는 거리의 언어.</p><span class="index">CONTENT PLAN / 준비 중</span></article></div></div></section>
+
+    <section class="wrap method" id="method"><div><div class="section-marker">OUR METHOD / 003</div><h2>이해하기 쉬워도,<br>숫자는 정확해야 하니까.</h2></div><div><p>A2O는 설명을 아름답게 만드는 만큼 숫자를 정직하게 다룹니다. 수치는 원자료에서 검증하고, 평균값과 근삿값을 구분하며, 도식이 실제 크기 비례가 아닐 때에는 이를 분명하게 밝힙니다.</p><div class="method-list" style="margin-top:24px"><div class="method-item">SI 단위와 10의 거듭제곱 <span>01 / MEASURE</span></div><div class="method-item">지름·높이·거리의 구분 <span>02 / DEFINE</span></div><div class="method-item">1차 자료와 변경 이력 <span>03 / VERIFY</span></div></div></div></section>
+  </main>
+
+  <footer id="about"><div class="wrap"><div class="footer-top"><div><div class="footer-logo">A2O</div><div class="footer-title">ATOM TO ORBIT — INDEPENDENT SCIENCE ATLAS</div></div><p class="footer-note">눈에 보이지 않는 원자부터 거대한 천체까지.<br>숫자와 시각적 비교로 이해하는 세상의 크기.</p></div><div class="footer-bottom"><span>© 2026 A2O · DESIGN REFERENCE ONLY · NOT A LIVE SITE</span><span>MADE TO EXPLORE, MEASURE & UNDERSTAND.</span></div></div></footer>
+
+  <script>
+    // Interaction is included only to communicate the intended UI behavior to Codex.
+    // These are illustrative draft labels/values, not a verified production dataset.
+    const objects=[
+      {exponent:-10,name:'원자의 대표적 규모',kind:'예시 규모 · 근삿값',value:'1 × 10⁻¹⁰ m',detail:'약 0.1 nm'},
+      {exponent:-5.155,name:'적혈구의 대표적 지름',kind:'예시 규모 · 근삿값',value:'7 × 10⁻⁶ m',detail:'약 7 μm'},
+      {exponent:-1.398,name:'탁구공의 지름',kind:'예시 규모',value:'4 × 10⁻² m',detail:'약 40 mm'},
+      {exponent:7.105,name:'지구의 평균 지름',kind:'예시 규모 · 평균값',value:'1.27 × 10⁷ m',detail:'약 12,742 km'},
+      {exponent:9.143,name:'태양의 대표적 지름',kind:'예시 규모 · 근삿값',value:'1.39 × 10⁹ m',detail:'약 139만 km'}
+    ];
+    const slider=document.getElementById('scaleRange');
+    slider.addEventListener('input',()=>{
+      const currentExponent=Number(slider.value);
+      const o=objects.reduce((nearest,item)=>Math.abs(item.exponent-currentExponent)<Math.abs(nearest.exponent-currentExponent)?item:nearest);
+      document.getElementById('objectName').textContent=o.name;
+      document.getElementById('measureKind').textContent=o.kind;
+      document.getElementById('objectValue').textContent=o.value;
+      document.getElementById('objectDetail').textContent=o.detail;
+      slider.setAttribute('aria-valuetext','10의 '+currentExponent.toFixed(1)+'제곱 미터 부근: '+o.name+', '+o.detail);
+    });
+    document.getElementById('menuToggle').addEventListener('click',()=>{
+      const menu=document.getElementById('mobileNav');
+      menu.hidden=!menu.hidden;
+      document.getElementById('menuToggle').setAttribute('aria-expanded',String(!menu.hidden));
+    });
+    document.querySelectorAll('#mobileNav a').forEach(a=>a.addEventListener('click',()=>{
+      document.getElementById('mobileNav').hidden=true;
+      document.getElementById('menuToggle').setAttribute('aria-expanded','false');
+    }));
+  </script>
+</body>
+</html>

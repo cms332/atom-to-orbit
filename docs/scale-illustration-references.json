@@ -1,0 +1,125 @@
+[
+	{
+		"id": "dna",
+		"page": "https://pdb101.rcsb.org/global-health/antimicrobial-resistance/drugs/antibiotics/dna-synthesis/dna-synthesis",
+		"image": "https://cdn.rcsb.org/rcsb-pdb/content/619aec1f1609b94135c9b170/dna-1.png",
+		"features": "Two winding backbones, transverse base-pair rungs; measure transverse helix width, not fragment length."
+	},
+	{
+		"id": "virus",
+		"page": "https://wwwnc.cdc.gov/eid/article/17/11/11-0258_article",
+		"image": "https://wwwnc.cdc.gov/eid/images/11-0258-F1.jpg",
+		"features": "Intact rounded envelope, dense short capped surface projections and subdued surface texture; no invented exposed internal RNA. Specific spherical H1N1 study particles."
+	},
+	{
+		"id": "ecoli",
+		"page": "https://education.nationalgeographic.org/resource/escherichia-coli-e-coli/",
+		"image": "https://images.nationalgeographic.org/image/upload/v1652340959/EducationHub/photos/e-coli.jpg",
+		"features": "Rounded rod with textured envelope; measure cell body excluding optional filaments."
+	},
+	{
+		"id": "red-cell",
+		"page": "https://www.pbs.org/wgbh/nova/genes/fate-02.html",
+		"image": "https://www.pbs.org/wgbh/nova/genes/images/fate-02.jpg",
+		"features": "Biconcave oblique disc with a continuous shaded rim and soft central depression, no nucleus-like central patch."
+	},
+	{
+		"id": "hair",
+		"page": "https://www.jeol.co.jp/solutions/applications/nano/details/367183f9e90c12e3b5812252d41693a465bf9809.html",
+		"image": "https://www.jeol.co.jp/solutions/applications/assets/images/063.jpg",
+		"features": "Cylindrical shaft with overlapping, irregular cuticle scales; measure thickness."
+	},
+	{
+		"id": "lead",
+		"page": "https://www.pentel.com/products/super-hi-polymer-lead-0-5mm-12-pieces",
+		"image": "https://content.oppictures.com/Master_Images/Master_Variants/Variant_1500/15119775.JPG",
+		"features": "Dark slender graphite rod, flat cut end and subtle longitudinal highlight; nominal thickness."
+	},
+	{
+		"id": "battery",
+		"page": "https://data.energizer.com/pdfs/E91_Max_NA.pdf",
+		"image": "https://volarismusic.com.au/cdn/shop/products/e91aa.jpg?v=1675822167",
+		"features": "Cylinder, wrapped casing, raised positive terminal; diameter and full length distinguished."
+	},
+	{
+		"id": "coin",
+		"page": "https://i.ebayimg.com/images/g/NxgAAeSwzeJosR~g/s-l1200.jpg",
+		"image": "https://i.ebayimg.com/images/g/NxgAAeSwzeJosR~g/s-l1200.jpg",
+		"features": "Circular metal disc with rim and denomination; original simplified reverse rather than copied portrait/engraving."
+	},
+	{
+		"id": "football",
+		"page": "https://commons.wikimedia.org/wiki/File:Football_(soccer_ball).svg",
+		"image": "https://upload.wikimedia.org/wikipedia/commons/6/6e/Football_%28soccer_ball%29.svg",
+		"creator": "flomar",
+		"license": "CC0-1.0",
+		"localReference": "docs/reference-assets/football-flomar-cc0.svg",
+		"features": "Adapted curved pentagonal/hexagonal panel contours, continuous circular silhouette and fine seams. A2O palette, gentle spherical shading, no ground shadow or brand graphics. See FOOTBALL_SVG.md."
+	},
+	{
+		"id": "whale",
+		"page": "https://www.fisheries.noaa.gov/species/blue-whale",
+		"image": "https://media.fisheries.noaa.gov/styles/original/s3/dam-migration/640x427-blue-whale.jpg?itok=Ffb4BA78&null=",
+		"features": "Long tapering body, broad head, small rear dorsal fin, pectoral fin, paired tail flukes and ventral pleats."
+	},
+	{
+		"id": "iss",
+		"page": "https://science.nasa.gov/science-research/science-enabling-technology/new-ai-algorithms-streamline-data-processing-for-space-based-instruments/",
+		"image": "https://science.nasa.gov/wp-content/uploads/2023/06/ai-algorithm-1.png?w=627",
+		"features": "Long truss, eight main paired solar-array wings, central cylindrical modules and radiators; diagram aligned to measured full array span."
+	},
+	{
+		"id": "tower",
+		"page": "https://www.skyscrapercenter.com/building/lotte-world-tower/88",
+		"image": "https://s3.amazonaws.com/images.skyscrapercenter.com/thumbs/19841_500x792.jpg",
+		"features": "Slender tapering curved facade, split crown and vertical mullions; vertical tip height."
+	},
+	{
+		"id": "phobos",
+		"page": "https://science.nasa.gov/resource/stickney-crater-phobos/",
+		"image": "https://assets.science.nasa.gov/content/dam/science/psd/mars/downloadable_items/3/36902_12_Stickney_Crater_Phobos.jpg",
+		"features": "Lumpy elongated moon, dominant Stickney crater, shallow grooves; approximate long axis."
+	},
+	{
+		"id": "vesta",
+		"page": "https://science.nasa.gov/resource/a-full-frame-view-of-vesta/",
+		"image": "https://science.nasa.gov/wp-content/uploads/2023/09/PIA14778_hires.jpg?format=jpeg&w=4096",
+		"features": "Softly irregular cratered outline and subdued southern basin relief. Normalized mean-diameter study, not a precise topographic projection or a literal surface map."
+	},
+	{
+		"id": "neptune",
+		"page": "https://science.nasa.gov/asset/webb/neptune-voyager-2/",
+		"image": "https://assets.science.nasa.gov/dynamicimage/assets/science/missions/webb/science/2020/02/STScI-01EVSTT4S1TW8QH9QCE3YPGF6T.png?crop=faces%2Cfocalpoint&fit=clip&h=2185&w=2188",
+		"features": "Blue atmospheric disc with delicate cloud bands and a dark storm; stylized Voyager-era feature, not a live weather map."
+	},
+	{
+		"id": "mercury",
+		"page": "https://science.nasa.gov/mercury/",
+		"image": "https://science.nasa.gov/wp-content/uploads/2023/11/mercury-messenger-globe-pia15162.jpg",
+		"features": "MESSENGER globe: cratered grey rocky surface, impact rims and bright ejecta rays. Measure volumetric mean body diameter."
+	},
+	{
+		"id": "venus",
+		"page": "https://science.nasa.gov/mission/venus-express",
+		"image": "https://science.nasa.gov/wp-content/uploads/2024/03/venus-mariner-10-pia23791-fig2.jpg?format=jpeg&w=4096",
+		"features": "Mariner 10 view: bright cream cloud cover and subdued curved atmospheric streaks; no exposed continents."
+	},
+	{
+		"id": "mars",
+		"page": "https://science.nasa.gov/photojournal/center-is-at-latitude-30-degrees-north-longitude-30-degrees/",
+		"image": "https://assets.science.nasa.gov/content/dam/science/psd/photojournal/pia/pia00/pia00192/PIA00192.jpg",
+		"features": "Viking globe: rust-coloured terrain, darker regions, pale polar cap, and a long canyon feature; simplified surface motifs rather than a map."
+	},
+	{
+		"id": "saturn",
+		"page": "https://www3.nasa.gov/specials/60counting/system.html",
+		"image": "https://www3.nasa.gov/specials/60counting/img/saturn.jpg",
+		"features": "Cassini view: pale banded planet inside broad tilted rings with foreground/background occlusion and Cassini division. Body diameter is the measured object; ring radii are separately source-backed."
+	},
+	{
+		"id": "uranus",
+		"page": "https://science.nasa.gov/asset/webb/uranus-voyager-2/",
+		"image": "https://assets.science.nasa.gov/content/dam/science/missions/webb/science/2020/02/STScI-01EVSTT9CQYZ9K7ZTZHQXRSPRC.png/jcr%3Acontent/renditions/cq5dam.web.1280.1280.png",
+		"features": "Voyager 2 globe: pale cyan/green atmospheric haze, very faint low-contrast bands; distinguish from the deeper blue Neptune."
+	}
+]

@@ -1,0 +1,27 @@
+A2O orbit surface textures
+
+Creator: Solar System Scope / INOVE (https://www.solarsystemscope.com/)
+Collection: https://www.solarsystemscope.com/textures/
+License: Creative Commons Attribution 4.0 International (CC BY 4.0)
+https://creativecommons.org/licenses/by/4.0/
+
+Downloaded on 2026-10-20. A2O changes: resized the original 2048 x 1024 JPEG
+maps to 1024 x 512 WebP, quality 83. The maps have been color adjusted by
+their original creator and may contain fictional terrain for unmapped regions.
+No endorsement by INOVE, Solar System Scope or NASA is implied.
+
+Original URLs (base: https://www.solarsystemscope.com/textures/download/):
+mercury.webp       2k_mercury.jpg
+venus.webp         2k_venus_atmosphere.jpg
+earth.webp         2k_earth_daymap.jpg
+mars.webp          2k_mars.jpg
+jupiter.webp       2k_jupiter.jpg
+saturn.webp        2k_saturn.jpg
+uranus.webp        2k_uranus.jpg
+neptune.webp       2k_neptune.jpg
+sun.webp           2k_sun.jpg
+earth-clouds.webp  2k_earth_clouds.jpg
+
+Local maps are under /orbit/textures/. Saturn rings, background stars and
+the solar halo are generated independently by A2O, not downloaded imagery.
+The Helix, HeliocentricSpiralMotion and other reference renderers were not copied.
