@@ -144,3 +144,36 @@ NPM 내부 모듈 API는 현재 설치 버전에서 검증한다. NPM 업그레�
   이 결과를 정리한 후속 문서 커밋은 배포 소스로 소급하지 않는다.
 - 증거: `artifacts/finale-footer-deployment/`의 `source-ci.json`, `metadata-and-assets.json`,
   `github-deployment-success.json`, `public-20261021T111559Z/verification.json` 및 실제 PC/모바일 캡처.
+
+## 새 원자 이야기와 네 기사 독해 개편 배포 — 2026-10-23 (KST)
+
+- 소유자가 로컬에서 검토한 전체 변경의 Push와 CI 통과 후 배포를 승인했다.
+  [PR #7](https://github.com/cms332/atom-to-orbit/pull/7)을 필수 검사 통과 후 main에 병합했다.
+- 실제 배포 소스: `646716706de1aaa8c8eabb7a9ca42bd14f7f0775`.
+  [해당 커밋 CI](https://github.com/cms332/atom-to-orbit/actions/runs/39852478623)에서
+  타입 검사·린트·단위 테스트 62개·정적 빌드·PC/모바일 브라우저 검사 70개가 통과한 뒤 배포했다.
+- 릴리스 `20261022T205611Z`, 직전 정상 릴리스 `20261021T111559Z`.
+  소스 패키지 SHA-256: `7a7693711c1bb9ab3d0a81b1d38474fbb21159b5e3f70fa8d0ab8b84963bd8b4`.
+  실제 빌드 시각: `2026-10-22T20:56:47.586Z` (2026-10-23 KST 05:56:47.586).
+  공개 `/build-info.json`의 commit·release·sourceSha256이 배포 패키지와 일치한다.
+- 새 기사 ‘원자는 거의 빈 공간인데, 왜 책상은 단단할까?’를 처음 공개했다.
+  기존 원자 크기·지구와 달·움직이는 지구 기사의 쉬운 설명과 상호작용도 함께 반영했다.
+  핵 확대 단계 안내, 전자 발견 가능성 도식, 원자 기준 확대 시 탁구공과 달 비교,
+  지구·달 공 모형 질문을 포함한다. 과학 수치와 상세 계산·출처는 유지한다.
+- Linux 검사·단위 테스트·빌드·새 컨테이너 healthcheck가 통과했다.
+  다른 컨테이너 26개와 기존 프록시 설정 6개의 상태/해시가 유지됐다.
+  DNS, HGI, 공용 Umami/PostgreSQL 설정은 변경하지 않았다.
+- 공개 HTTP 경로 12개와 PC 1440×1000 / 모바일 360×800 검증이 통과했다.
+  네 기사 메타데이터·접힌 출처·주요 도식/조작, 기준 전환과 재생·정지·재개,
+  기존 탐험기·모바일 설정·6장 자취와 푸터 안내 부재를 확인했다.
+  페이지 오류·실패한 자원 요청은 0개다. 실제 공개 캡처도 확인했다.
+  모바일은 Chromium 터치 에뮬레이션이며 실제 단말 검증은 아니다.
+- 이전 JavaScript 모듈 주소 36개는 정상 응답한다. 네이버 확인 파일은 이전 공개 버전과
+  SHA-256 `8044c0b06f05cddbd0faf3ce5244c6d7684f3a83a7b7f692f3ea47e79cbcd053`이 동일하다.
+- 배포 태그 `deployed-20261022T205611Z`는 위 실제 배포 소스를 가리키며 GitHub에 전송했다.
+  GitHub production Deployment `7263528654`에 CI·릴리스·해시·시각과 검증 후 success를 기록했다.
+  배포 결과를 정리하는 후속 문서 커밋은 별도이며 운영 사이트의 소스 커밋으로 소급하지 않는다.
+- 증거: `artifacts/science-articles-deployment/`의 `source-ci.json`, `source-ci.log`,
+  `metadata-and-assets.json`, `server-audit-summary.json`, `github-deployment-success.json`,
+  `public-20261022T205611Z/verification.json` 및 실제 PC/모바일 캡처.
+  비공개 서버 감사 원본·자격 증명은 저장소에 포함하지 않는다.
