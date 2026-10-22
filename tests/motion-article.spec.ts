@@ -38,7 +38,20 @@ test('motion article is discoverable, sourced and has valid article metadata', a
 		'https://a2o.kr/og-default.png'
 	);
 	expect((await request.get('/og-default.png')).headers()['content-type']).toContain('image/png');
-	await expect(page.locator('#question-4 + p')).toContainText('지구 평균 지름의 약 18%');
+	await expect(page.locator('#question-4 + p')).toContainText('2,300km');
+	await expect(page.locator('#question-4 + p')).toContainText('5분의 1에 가까운');
+	await expect(page.locator('.sources-disclosure')).toContainText('약 18%');
+	await expect(page.locator('.sources-disclosure')).toContainText('107,208km/h');
+	const visibleArticle = await page.locator('article').innerText();
+	expect(visibleArticle).not.toMatch(/자유낙하|가속 운동|조석 효과|코리올리|푸코|기준계|투영/);
+	await expect(page.locator('article')).toContainText('중력은 물체끼리 서로 끌어당기는 힘');
+	await expect(page.locator('article')).toContainText('태어나던 순간부터 지금까지 지구와 함께');
+	const toc = page.getByRole('navigation', { name: '이 글의 순서' }).getByRole('link');
+	await expect(toc).toHaveCount(4);
+	for (let i = 0; i < 4; i++) {
+		await toc.nth(i).click();
+		await expect(page.locator(`#question-${i + 1}`)).toBeInViewport();
+	}
 	await expect(page.locator('meta[name="twitter:title"]')).toHaveAttribute(
 		'content',
 		`${title} | A2O`
@@ -50,11 +63,25 @@ test('motion article is discoverable, sourced and has valid article metadata', a
 	const fontPreload = (await page.locator('link[rel="preload"][as="font"]').getAttribute('href'))!;
 	expect(fontPreload).toMatch(/A2OSans-Subset\.woff2\?v=[a-f0-9]{12}$/);
 	expect([...new Set(fontRequests)]).toEqual([new URL(fontPreload, page.url()).href]);
-	for (const value of ['1,670', '29.78', '230'])
+	for (const value of ['1,670', '107,000', '828,000'])
 		await expect(page.locator('.motion-speeds')).toContainText(value);
+	await expect(page.locator('.motion-speeds .approx')).toHaveText([
+		'시속 약',
+		'시속 약',
+		'시속 약'
+	]);
+	await expect(page.locator('.motion-speeds')).not.toContainText('km/s');
 	await expect(page.locator('.motion-speeds')).toContainText('적도 지표면');
 	await expect(page.locator('.motion-speeds')).toContainText('단순히 더할 수 없습니다');
-	await expect(page.locator('.article-sources li')).toHaveCount(10);
+	await expect(page.locator('.article-sources li')).toHaveCount(13);
+	const advanced = page.locator('.inertia-figure .model-notes');
+	await expect(advanced).not.toHaveAttribute('open');
+	await advanced.locator('summary').click();
+	await expect(advanced).toHaveAttribute('open');
+	await expect(advanced).toContainText('자유낙하');
+	await expect(advanced).toContainText('가속 운동');
+	await expect(advanced).toContainText('코리올리 효과');
+	await advanced.locator('summary').click();
 	for (const link of await page.locator('.article-sources li > a').all())
 		expect(await link.getAttribute('href')).toMatch(/^https:\/\//);
 	await expect(page.locator('.motion-speeds details')).toHaveCount(0);
@@ -87,6 +114,7 @@ test('reference-frame toggle keeps time and relative geometry, supports keyboard
 	const initialDrawing = (await figure.locator('.drawing').boundingBox())!;
 	expect(initialDrawing.height).toBeCloseTo(initialDrawing.width * (310 / 640) * 1.7, 1);
 	await expect(figure.locator('.frame-summary')).toContainText('태양 고정');
+	await expect(figure.locator('.frame-summary')).toContainText('태양을 따라가며 보면');
 	await slider.focus();
 	await slider.press('Home');
 	await slider.press('ArrowRight');
@@ -98,6 +126,7 @@ test('reference-frame toggle keeps time and relative geometry, supports keyboard
 	await galaxy.press('Enter');
 	await expect(galaxy).toHaveAttribute('aria-pressed', 'true');
 	await expect(figure.locator('.frame-summary')).toContainText('태양도 이동');
+	await expect(figure.locator('.frame-summary')).toContainText('길게 이어져요');
 	await expect(figure.locator('.legend')).toContainText('태양의 이동 경로');
 	const summaryBottom = (await figure.locator('.frame-summary').boundingBox())!;
 	const drawingTop = (await figure.locator('.drawing').boundingBox())!;
@@ -112,6 +141,10 @@ test('reference-frame toggle keeps time and relative geometry, supports keyboard
 	expect(await figure.locator('svg > path').nth(2).getAttribute('d')).not.toBe(solarPath);
 	await expect(figure.locator('figcaption')).toContainText('1/20');
 	await expect(figure.locator('figcaption')).toContainText('실시간 위치가 아닙니다');
+	await expect(figure.locator('.simple-model-note')).toBeVisible();
+	await expect(figure.locator('.simple-model-note')).toContainText(
+		'그림 크기는 실제 비율이 아니에요'
+	);
 	await slider.press('End');
 	await expect(figure).toHaveAttribute('data-phase', '1');
 	await figure.screenshot({ path: `artifacts/motion-article/${info.project.name}-galactic.png` });
@@ -141,8 +174,14 @@ test('reference-frame toggle keeps time and relative geometry, supports keyboard
 test('article stays readable at narrow widths and enlarged text', async ({ page }, info) => {
 	await page.goto(route);
 	await page.evaluate(() => document.fonts.ready);
+	await page.locator('.motion-speeds').screenshot({
+		path: `artifacts/motion-reading-level/${info.project.name}-speeds.png`
+	});
+	await page.locator('.inertia-figure').screenshot({
+		path: `artifacts/motion-reading-level/${info.project.name}-train.png`
+	});
 	await page.screenshot({
-		path: `artifacts/motion-article/${info.project.name}-article.png`,
+		path: `artifacts/motion-reading-level/${info.project.name}-article.png`,
 		fullPage: true
 	});
 	for (const width of info.project.name === 'desktop' ? [1440, 768, 390, 320] : [390, 320]) {

@@ -2,6 +2,7 @@
 	import type { Article } from '$lib/content/articles';
 	import Diagram from './Diagram.svelte';
 	import MotionThumbnail from './MotionThumbnail.svelte';
+	import AtomicSpaceThumbnail from './AtomicSpaceThumbnail.svelte';
 	let { article, headingLevel = 3 }: { article: Article; headingLevel?: 2 | 3 } = $props();
 </script>
 
@@ -11,7 +12,8 @@
 		aria-labelledby={`article-title-${article.slug}`}
 		aria-describedby={`article-intro-${article.slug}`}
 		><div class="article-art">
-			{#if article.diagram === 'motion'}<MotionThumbnail
+			{#if article.diagram === 'atomic-space'}<AtomicSpaceThumbnail
+				/>{:else if article.diagram === 'motion'}<MotionThumbnail
 				/>{:else if article.diagram === 'atom'}<Diagram kind="atom" />{:else}<svg
 					viewBox="0 0 440 200"
 					role="img"
@@ -64,9 +66,10 @@
 		margin-bottom: 23px;
 		border-radius: 7px;
 	}
-	.article-art svg {
+	.article-art :global(svg) {
 		width: 100%;
 		height: 100%;
+		display: block;
 	}
 	.article-meta {
 		font-size: 11px;

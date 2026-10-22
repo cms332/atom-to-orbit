@@ -109,7 +109,7 @@ test('floating top arrow follows restored scroll and hides after client navigati
 	await expect(top).toBeVisible();
 	await page.reload();
 	await expect(top).toBeVisible();
-	await page.getByRole('contentinfo').getByRole('link', { name: 'A2O', exact: true }).click();
+	await page.getByRole('contentinfo').getByRole('link', { name: 'A2O 홈', exact: true }).click();
 	await expect.poll(() => page.evaluate(() => scrollY)).toBeLessThanOrEqual(1);
 	await expect(top).toBeHidden();
 });
@@ -160,7 +160,7 @@ test('short filtered pages reveal the top arrow before reaching the footer', asy
 	for (const width of [775, 976, 390]) {
 		await page.setViewportSize({ width, height: 892 });
 		await page.goto('/articles/?topic=micro');
-		await expect(page.getByRole('status')).toContainText('미시 세계 이야기 · 1편');
+		await expect(page.getByRole('status')).toContainText('미시 세계 이야기 · 2편');
 		await page.evaluate(() => document.fonts.ready);
 		const top = page.locator('a.back-to-top');
 		await expect(top).toBeHidden();
@@ -202,7 +202,7 @@ test('short filtered pages reveal the top arrow before reaching the footer', asy
 		.getByRole('navigation', { name: '이야기 주제 필터' })
 		.getByRole('link', { name: '미시 세계', exact: true })
 		.click();
-	await expect(page.getByRole('status')).toContainText('미시 세계 이야기 · 1편');
+	await expect(page.getByRole('status')).toContainText('미시 세계 이야기 · 2편');
 	await page.evaluate(() => scrollTo(0, document.documentElement.scrollHeight));
 	await expect(page.locator('a.back-to-top')).toBeVisible();
 	// With no overflow the visitor is already at the top, so the control stays hidden.

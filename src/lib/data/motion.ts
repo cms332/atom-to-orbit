@@ -19,8 +19,8 @@ export const motionMeasurements: readonly MotionMeasurement[] = [
 		metersPerSecond: 1670 / 3.6,
 		displayValue: '1,670',
 		displayUnit: 'km/h',
-		frame: '적도 지표면의 자전 선속도',
-		note: '위도에 따라 달라집니다.',
+		frame: '적도 지표면 기준',
+		note: '지구의 가운데를 두르는 적도에서 잰 값이에요. 다른 위치에서는 달라져요.',
 		sourceId: 'motion-rotation'
 	},
 	{
@@ -29,8 +29,8 @@ export const motionMeasurements: readonly MotionMeasurement[] = [
 		metersPerSecond: 29_780,
 		displayValue: '29.78',
 		displayUnit: 'km/s',
-		frame: '태양 중심 기준 · 평균',
-		note: '타원 궤도에서 속력은 변합니다.',
+		frame: '태양 기준 · 평균',
+		note: '지구가 태양 둘레를 도는 빠르기예요. 도는 동안 조금씩 달라져요.',
 		sourceId: 'motion-orbit'
 	},
 	{
@@ -39,11 +39,21 @@ export const motionMeasurements: readonly MotionMeasurement[] = [
 		metersPerSecond: SOLAR_SPEED_KM_S * 1000,
 		displayValue: String(SOLAR_SPEED_KM_S),
 		displayUnit: 'km/s',
-		frame: '은하 중심 기준 · 대표 근삿값',
-		note: '은하 한 바퀴에 약 2억 3천만 년.',
+		frame: '우리은하의 중심 기준 · 대표값',
+		note: '은하는 수많은 별이 모인 거대한 무리예요.',
 		sourceId: 'motion-galaxy'
 	}
 ];
+
+export function hourlySpeedLabel(item: MotionMeasurement): string {
+	const kilometersPerHour = item.metersPerSecond * 3.6;
+	// Round the orbital value (107,208km/h) for the elementary reading level.
+	const rounded =
+		item.id === 'orbit'
+			? Math.round(kilometersPerHour / 1000) * 1000
+			: Math.round(kilometersPerHour);
+	return rounded.toLocaleString('en-US');
+}
 
 export const tenSecondTravelMeters = SOLAR_SPEED_KM_S * 1000 * 10;
 
@@ -124,5 +134,29 @@ export const motionSources: ScienceSource[] = [
 		accessedAt: '2026-10-21',
 		basis:
 			'Table 1의 J2000 궤도요소와 변화율. 기사 도식과 탐험기는 같은 계산을 사용하며 지구는 지구–달 질량중심으로 근사합니다.'
+	},
+	{
+		id: 'motion-earth-for-kids',
+		label: 'NASA · What Is Earth? (Grades K-4)',
+		url: 'https://www.nasa.gov/learning-resources/for-kids-and-students/what-is-earth-grades-k-4/',
+		accessedAt: '2026-10-23',
+		basis:
+			'지구가 자전하며 약 하루에 한 바퀴 돌고, 약 1년에 태양 둘레를 한 바퀴 공전한다는 어린이용 설명입니다.'
+	},
+	{
+		id: 'motion-orbit-for-kids',
+		label: 'NASA · What Is an Orbit? (Grades K-4)',
+		url: 'https://www.nasa.gov/learning-resources/for-kids-and-students/what-is-an-orbit-grades-k-4/',
+		accessedAt: '2026-10-23',
+		basis:
+			'궤도는 다른 천체 둘레를 도는 길입니다. 움직임을 이어가려는 성질과 중력이 길을 휘어지게 하는 역할을 쉬운 말로 설명합니다.'
+	},
+	{
+		id: 'motion-microgravity-for-kids',
+		label: 'NASA · What Is Microgravity? (Grades 5-8)',
+		url: 'https://www.nasa.gov/learning-resources/for-kids-and-students/what-is-microgravity-grades-5-8/',
+		accessedAt: '2026-10-23',
+		basis:
+			'중력은 우주에서도 작용합니다. 우주선·사람·물체가 중력 아래 함께 떨어지는 운동으로 무게를 느끼는 방식이 달라짐을 설명합니다. 이 글은 그 원리를 지구와 몸이 태양 중력 아래 거의 함께 공전한다는 설명에 참고합니다.'
 	}
 ];

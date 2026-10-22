@@ -40,4 +40,4 @@ jobs:
       - name: Install test browser
         run: bunx playwright install --with-deps chromium
       - name: Article, navigation and orbit smoke tests
-        run: bun run test:e2e -- tests/site.spec.ts tests/motion-article.spec.ts tests/article-format.spec.ts tests/analytics.spec.ts tests/orbit-finale.spec.ts
+        run: bun run test:e2e -- tests/site.spec.ts tests/motion-article.spec.ts tests/article-format.spec.ts tests/analytics.spec.ts tests/orbit-finale.spec.ts tests/atomic-space.spec.ts tests/atomic-scale.spec.ts tests/earth-moon.spec.ts

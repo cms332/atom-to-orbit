@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
+import { articles } from '../src/lib/content/articles';
 import { objects } from '../src/lib/data/science';
 import { MAX_EXPONENT } from '../src/lib/utils/scales';
 import { SCENE_HEADROOM } from '../src/lib/utils/scale-scene';
@@ -155,14 +156,16 @@ test('articles filter, real article, primary source and related explorer', async
 		.getByRole('navigation', { name: '이야기 주제 필터' })
 		.getByRole('link', { name: '미시 세계', exact: true })
 		.click();
-	await expect(page.locator('.article-card')).toHaveCount(1);
+	await expect(page.locator('.article-card')).toHaveCount(
+		articles.filter((a) => a.categoryId === 'micro').length
+	);
 	await expect(
 		page.getByRole('heading', { level: 2, name: '원자의 크기는 어떻게 읽을까?' })
 	).toBeVisible();
 	await expect(
 		page.getByRole('link', { name: '원자의 크기는 어떻게 읽을까?', exact: true })
 	).toHaveCount(1);
-	await page.locator('.article-card a').click();
+	await page.getByRole('link', { name: '원자의 크기는 어떻게 읽을까?', exact: true }).click();
 	await expect(page.getByRole('heading', { level: 1 })).toHaveText('원자의 크기는 어떻게 읽을까?');
 	await page.evaluate(() => document.fonts.ready);
 	await page.locator('.article-header').screenshot({
@@ -506,15 +509,21 @@ test('topic links retain filters on reload and restore results through browser h
 	await expect(page).toHaveURL(/topic=micro$/);
 	await expect(micro).toBeFocused();
 	await expect(micro).toHaveAttribute('aria-current', 'page');
-	await expect(page.getByRole('status')).toHaveText('미시 세계 이야기 · 1편');
+	await expect(page.getByRole('status')).toHaveText(
+		`미시 세계 이야기 · ${articles.filter((a) => a.categoryId === 'micro').length}편`
+	);
 	await page.reload();
-	await expect(page.locator('.article-card')).toHaveCount(1);
+	await expect(page.locator('.article-card')).toHaveCount(
+		articles.filter((a) => a.categoryId === 'micro').length
+	);
 	await filters.getByRole('link', { name: '전체', exact: true }).click();
-	await expect(page.locator('.article-card')).toHaveCount(3);
+	await expect(page.locator('.article-card')).toHaveCount(articles.length);
 	await page.goBack();
-	await expect(page.getByRole('status')).toHaveText('미시 세계 이야기 · 1편');
+	await expect(page.getByRole('status')).toHaveText(
+		`미시 세계 이야기 · ${articles.filter((a) => a.categoryId === 'micro').length}편`
+	);
 	await page.goForward();
-	await expect(page.getByRole('status')).toHaveText('전체 이야기 · 3편');
+	await expect(page.getByRole('status')).toHaveText(`전체 이야기 · ${articles.length}편`);
 	await page.goto('/articles/?topic=unknown');
-	await expect(page.locator('.article-card')).toHaveCount(3);
+	await expect(page.locator('.article-card')).toHaveCount(articles.length);
 });

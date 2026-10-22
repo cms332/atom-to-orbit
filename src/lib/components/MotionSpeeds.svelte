@@ -1,22 +1,25 @@
 <script lang="ts">
-	import { motionMeasurements } from '$lib/data/motion';
+	import { motionMeasurements, hourlySpeedLabel } from '$lib/data/motion';
 	let { sourceIds }: { sourceIds: readonly string[] } = $props();
 </script>
 
 <aside class="motion-speeds" aria-label="움직이는 지구의 대표 속도">
+	<h3>지구와 태양계는 얼마나 빠를까요?</h3>
 	<dl>
 		{#each motionMeasurements as item (item.id)}
 			{@const sourceNumber = sourceIds.indexOf(item.sourceId) + 1}
 			<div>
-				<dt>{item.name}</dt>
-				<dd class="value">
-					<span class="approx">약</span> <strong>{item.displayValue}</strong>
-					<span>{item.displayUnit}</span>
+				<dt>
+					<span>{item.name}</span>
 					<a
 						class="source-ref"
 						href={`#source-${item.sourceId}`}
 						aria-label={`${item.name} 출처 ${sourceNumber}`}>[{sourceNumber}]</a
 					>
+				</dt>
+				<dd class="value">
+					<span class="approx">시속 약</span>
+					<span class="numeric"><strong>{hourlySpeedLabel(item)}</strong><span>km</span></span>
 				</dd>
 				<dd class="frame">{item.frame}</dd>
 				<dd class="detail">
@@ -25,12 +28,20 @@
 			</div>
 		{/each}
 	</dl>
-	<p>각 속도는 기준과 방향이 다르므로 숫자만 단순히 더할 수 없습니다.</p>
+	<p>
+		시속은 한 시간 동안 가는 거리로 나타낸 빠르기예요. 세 속도는 재는 기준과 방향이 달라 단순히 더할
+		수 없습니다.
+	</p>
 </aside>
 
 <style>
 	.motion-speeds {
 		margin: 32px 0;
+	}
+	h3 {
+		font-size: 20px;
+		margin: 0 0 18px;
+		line-height: 1.5;
 	}
 	dl {
 		display: grid;
@@ -49,6 +60,10 @@
 		padding-right: 0;
 	}
 	dt {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 6px;
 		font-size: 14px;
 		font-weight: 650;
 		margin-bottom: 12px;
@@ -58,11 +73,17 @@
 	}
 	.value {
 		display: flex;
-		align-items: baseline;
-		gap: 6px;
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 4px;
 		color: var(--teal);
 		white-space: nowrap;
 		font: 13px var(--font-mono);
+	}
+	.numeric {
+		display: inline-flex;
+		align-items: baseline;
+		gap: 6px;
 	}
 	.value strong {
 		font-size: clamp(25px, 3vw, 31px);
@@ -92,6 +113,7 @@
 		justify-content: center;
 		min-width: 44px;
 		min-height: 44px;
+		flex-shrink: 0;
 		font: 12px var(--font-mono);
 		text-decoration: none;
 	}
@@ -120,6 +142,7 @@
 			padding-top: 0;
 		}
 		dt {
+			grid-column: 1 / -1;
 			margin-bottom: 0;
 			align-self: center;
 		}

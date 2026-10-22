@@ -1,6 +1,9 @@
 import { additionalObjects, additionalSources } from './science-expansion';
 import { planetObjects, planetSources } from './science-planets';
 import { motionSources } from './motion';
+import { BOHR_RADIUS, atomicSpaceSources } from './atomic-space';
+import { earthMoonSources } from './earth-moon-sources';
+export { BOHR_RADIUS } from './atomic-space';
 export type DimensionKind = 'diameter' | 'length' | 'height' | 'distance';
 export type ApproximationKind =
 	'approximate' | 'mean' | 'standard' | 'representative' | 'maximum' | 'nominal';
@@ -51,6 +54,22 @@ export const sources: ScienceSource[] = [
 		basis: '체적 평균 반지름 1,737.4 km. 궤도 긴반지름 384,400 km.'
 	},
 	{
+		id: 'atomic-radius-definitions',
+		label: 'OpenStax · Chemistry 2e, 6.5 원자 반지름을 정하는 방법',
+		url: 'https://openstax.org/books/chemistry-2e/pages/6-5-periodic-variations-in-element-properties',
+		accessedAt: '2026-10-23',
+		basis:
+			'원자에는 하나의 명확한 가장자리가 없어 반지름을 정하는 실용적인 기준이 여럿 있습니다. 공유 반지름은 결합한 같은 원자 두 개의 핵 사이 거리의 절반으로 정의합니다. 이 글의 2a₀는 비교용 기준 길이이며, 이러한 모든 원자 반지름 정의를 대체하지 않습니다.'
+	},
+	{
+		id: 'nano-units',
+		label: 'NNCO · Just How Small Is Nano?',
+		url: 'https://www.nano.gov/about-nanotechnology/just-how-small-is-nano/',
+		accessedAt: '2026-10-23',
+		basis:
+			'SI 접두어 nano는 10억분의 1을 뜻합니다. 1nm = 10⁻⁹m입니다. 본문은 익숙한 길이를 먼저 비교한 뒤 이 단위를 소개합니다.'
+	},
+	{
 		id: 'earth',
 		label: 'NASA · Earth Fact Sheet',
 		url: nasa + 'earthfact.html',
@@ -80,14 +99,15 @@ export const sources: ScienceSource[] = [
 	},
 	...additionalSources,
 	...planetSources,
-	...motionSources
+	...motionSources,
+	...atomicSpaceSources,
+	...earthMoonSources
 ];
 export function sourceById(id: string): ScienceSource {
 	const source = sources.find((s) => s.id === id);
 	if (!source) throw new Error(`Unknown source: ${id}`);
 	return source;
 }
-export const BOHR_RADIUS = 5.29177210544e-11;
 export const EARTH_MOON_METERS = 384_400_000;
 const originalObjects: ScaleObject[] = [
 	{

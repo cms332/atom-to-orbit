@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import { articles } from '../src/lib/content/articles';
 
-test('article format and source disclosures are consistent across all three articles', async ({
+test('article format and source disclosures are consistent across all articles', async ({
 	page
 }, info) => {
 	const errors: string[] = [];
@@ -19,7 +19,7 @@ test('article format and source disclosures are consistent across all three arti
 		await expect(page.locator('article summary').filter({ hasText: '자료 및 출처' })).toHaveCount(
 			1
 		);
-		await expect(page.locator('article summary')).toHaveCount(article.diagram === 'motion' ? 3 : 2);
+		await expect(page.locator('article summary')).toHaveCount(article.diagram !== 'moon' ? 3 : 2);
 		for (const selector of [
 			'.article-header',
 			'.article-nav',
@@ -49,7 +49,7 @@ test('article format and source disclosures are consistent across all three arti
 		).toEqual(['explorer-invitation', 'article-sources', 'next']);
 		await expect(page.locator('.explorer-invitation h2')).toHaveText('직접 탐험해 보세요.');
 		await expect(page.locator('.next h2')).toHaveText('다음 이야기');
-		await expect(page.locator('.next a')).toHaveCount(2);
+		await expect(page.locator('.next a')).toHaveCount(articles.length - 1);
 		await page.evaluate(() => document.fonts.ready);
 		await page
 			.locator('article figure')
@@ -133,6 +133,12 @@ test('article sources and figure references open without JavaScript', async ({ b
 		await page.goto(`http://127.0.0.1:4173/articles/${article.slug}/`);
 		const sources = page.locator('.sources-disclosure');
 		await expect(sources).not.toHaveAttribute('open');
+		if (article.diagram === 'atomic-space') {
+			await expect(page.locator('article input[type="range"]:disabled')).toHaveCount(2);
+			await expect(page.locator('.atomic-distance')).toContainText('약 315');
+			await expect(page.locator('.probability-result')).toContainText('10.8%');
+			await expect(page.locator('article')).toContainText('파울리 배타 원리');
+		}
 		const notes = page.locator('article figure').first().locator('.model-notes');
 		await notes.locator('summary').click();
 		const reference = notes.locator('a[href^="#source-"]').first();

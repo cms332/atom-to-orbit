@@ -55,8 +55,8 @@
 		viewBox={MOTION_VIEW_BOX.join(' ')}
 		role="img"
 		aria-label={view === 'solar'
-			? '태양을 기준으로 약 한 바퀴의 지구 공전을 본 투영도'
-			: '은하의 국부 고정 기준에서 태양 이동과 지구 공전을 함께 본 투영도'}
+			? '태양을 따라가며 지구가 약 한 바퀴 도는 모습을 본 그림'
+			: '은하를 기준으로 태양의 이동과 지구가 태양 둘레를 도는 모습을 함께 본 그림'}
 		data-testid={`motion-${view}-diagram`}
 	>
 		<desc
@@ -148,8 +148,8 @@
 		<strong>{frame === 'solar' ? '태양 고정' : '태양도 이동'}</strong>
 		<span
 			>{frame === 'solar'
-				? '지구의 길은 태양 둘레로 거의 닫힌 타원을 그립니다.'
-				: '태양의 이동이 더해져 지구의 지나온 길이 열립니다.'}</span
+				? '태양을 따라가며 보면, 지구가 태양 둘레를 거의 한 바퀴 돌아요.'
+				: '태양도 움직여서 지구가 지나온 길이 길게 이어져요.'}</span
 		>
 	</p>
 	<button
@@ -207,6 +207,9 @@
 		<div class="drawing">{@render drawing('galactic', 1)}</div>
 	</noscript>
 	<figcaption>
+		<p class="simple-model-note">
+			보기 쉽게 태양의 이동은 1/20로 줄였어요. 태양과 지구의 그림 크기는 실제 비율이 아니에요.
+		</p>
 		<ArticleDisclosure class="model-notes" label="모형 설명">
 			<p>
 				같은 시각·같은 공전 계산을 같은 방향에서 투영했습니다. 기준만 바꾸며 태양과 지구의 상대
@@ -354,6 +357,12 @@
 	}
 	figcaption strong {
 		font-weight: 650;
+	}
+	figcaption .simple-model-note {
+		margin: 0 0 8px;
+		font-size: 13px;
+		line-height: 1.8;
+		color: var(--muted);
 	}
 	noscript p {
 		font-size: 13px;
