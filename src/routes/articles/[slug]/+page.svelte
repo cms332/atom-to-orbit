@@ -1,11 +1,16 @@
 <script lang="ts">
 	import PageMeta from '$lib/components/PageMeta.svelte';
 	import MoonDistance from '$lib/components/MoonDistance.svelte';
-	import Diagram from '$lib/components/Diagram.svelte';
 	import MotionSpeeds from '$lib/components/MotionSpeeds.svelte';
 	import TrainInertia from '$lib/components/TrainInertia.svelte';
 	import MotionFrames from '$lib/components/MotionFrames.svelte';
+	import AtomicSpaceScale from '$lib/components/AtomicSpaceScale.svelte';
+	import AtomicProbability from '$lib/components/AtomicProbability.svelte';
 	import ArticleDisclosure from '$lib/components/ArticleDisclosure.svelte';
+	import AtomicReference from '$lib/components/AtomicReference.svelte';
+	import AtomBallMoon from '$lib/components/AtomBallMoon.svelte';
+	import LogScaleSteps from '$lib/components/LogScaleSteps.svelte';
+	import EarthMoonBalls from '$lib/components/EarthMoonBalls.svelte';
 	import { sourceById } from '$lib/data/science';
 	import { articles } from '$lib/content/articles';
 	import type { PageData } from './$types';
@@ -72,7 +77,7 @@
 
 <PageMeta title={article.title} description={article.intro} />
 <svelte:head>
-	<meta property="article:published_time" content={article.date} />
+	{#if article.date}<meta property="article:published_time" content={article.date} />{/if}
 	<!-- Only typed editorial metadata is serialized; all less-than characters are JSON-escaped. -->
 	<!-- eslint-disable-next-line svelte/no-at-html-tags -->
 	{@html schemaMarkup}
@@ -99,28 +104,27 @@
 						</li>{/each}
 				</ol>
 			</nav>
-			{#if article.diagram === 'moon'}<MoonDistance
-					inArticle
-				/>{:else if article.diagram === 'atom'}<figure class="atom-figure">
-					<div class="atom-art"><Diagram kind="atom" /></div>
-					<strong>2a₀ ≈ 0.106 nm</strong>
-					<figcaption>
-						<ArticleDisclosure class="model-notes" label="모형 설명">
-							<p>
-								보어 반지름의 두 배를 기준 길이로 사용합니다. 상징적 도식이며 전자 궤도나 실제 크기
-								비례를 나타내지 않습니다.
-							</p>
-							<a href="#source-nist">NIST · 2022 CODATA ↗</a>
-						</ArticleDisclosure>
-					</figcaption>
-				</figure>{/if}{#each article.sections as section, i (section.title)}<section>
+			{#each article.sections as section, i (section.title)}<section>
 					<h2 id={`question-${i + 1}`}>{section.title}</h2>
 					<p>{section.text}</p>
 					{#each section.paragraphs ?? [] as paragraph (paragraph)}<p>{paragraph}</p>{/each}
 					{#if section.keyPoint}<p class="key-point">{section.keyPoint}</p>{/if}
 					{#if section.visual === 'inertia'}<TrainInertia
-						/>{:else if section.visual === 'frames'}<MotionFrames />{/if}
+						/>{:else if section.visual === 'frames'}<MotionFrames
+						/>{:else if section.visual === 'atomic-distance'}<AtomicSpaceScale
+						/>{:else if section.visual === 'atomic-probability'}<AtomicProbability
+						/>{:else if section.visual === 'atomic-reference'}<AtomicReference
+						/>{:else if section.visual === 'atom-ball-moon'}<AtomBallMoon
+						/>{:else if section.visual === 'log-steps'}<LogScaleSteps
+						/>{:else if section.visual === 'earth-moon-distance'}<MoonDistance
+							inArticle
+						/>{:else if section.visual === 'earth-moon-balls'}<EarthMoonBalls />{/if}
 				</section>{/each}
+			{#if article.closing}<section class="article-closing">
+					<h2>{article.closing.title}</h2>
+					{#each article.closing.paragraphs as paragraph (paragraph)}<p>{paragraph}</p>{/each}
+					{#if article.closing.keyPoint}<p class="key-point">{article.closing.keyPoint}</p>{/if}
+				</section>{/if}
 			<aside class="explorer-invitation">
 				<h2>직접 탐험해 보세요.</h2>
 				{#if article.diagram === 'motion'}
@@ -130,11 +134,23 @@
 					</p>
 					<a href="/orbit/" class="primary">궤도 탐험에서 직접 보기 ↗</a>
 				{:else}
-					<p>
-						{article.diagram === 'moon'
-							? '지구와 달의 크기를 같은 눈금에서 비교해 보세요.'
-							: '원자 규모의 기준 길이와 탁구공의 크기를 눈금으로 비교해 보세요.'}
-					</p>
+					{#if article.diagram === 'atomic-space'}
+						<p>
+							원자부터 탁구공, 지구, 태양까지. 눈에 보이지 않는 작은 세계가 얼마나 놀라운 크기
+							차이를 품고 있는지 크기 탐험기에서 직접 확인해 보세요.
+						</p>
+						<p>
+							원자의 크기를 정하는 방법이 더 궁금하다면 <a href="/articles/atomic-scale/"
+								>‘원자의 크기는 어떻게 읽을까?’</a
+							>도 함께 읽어 보세요.
+						</p>
+					{:else}
+						<p>
+							{article.diagram === 'moon'
+								? '지구와 달의 크기를 같은 눈금에서 비교해 보세요.'
+								: '원자부터 머리카락, 탁구공, 지구, 태양까지 크기를 바꿔 보세요.'}
+						</p>
+					{/if}
 					<a
 						href={`/scale/?object=${article.diagram === 'moon' ? 'earth' : 'atom'}`}
 						class="primary">크기 탐험으로 ↗</a
@@ -281,33 +297,7 @@
 		width: fit-content;
 		margin-top: 20px;
 	}
-	.atom-figure {
-		margin: 0;
-		padding: 26px;
-		background: var(--soft-teal);
-		border: 1px solid var(--line);
-		border-radius: 12px;
-	}
-	.atom-art {
-		height: 230px;
-	}
-	.atom-figure strong {
-		display: block;
-		font:
-			500 29px ui-monospace,
-			monospace;
-		color: var(--teal);
-	}
-	figcaption {
-		font-size: 12px;
-		color: var(--muted);
-		line-height: 1.8;
-		margin-top: 18px;
-	}
 	@media (max-width: 767px) {
-		.atom-figure {
-			padding: 20px;
-		}
 		.intro {
 			font-size: 17px;
 		}

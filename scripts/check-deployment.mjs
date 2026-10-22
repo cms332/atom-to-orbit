@@ -12,12 +12,18 @@ assert.match(info.commit, /^[a-f0-9]{40}$/);
 assert.match(info.release, /^\d{8}T\d{6}Z$/);
 if (process.env.A2O_EXPECTED_COMMIT) assert.equal(info.commit, process.env.A2O_EXPECTED_COMMIT);
 const responses = [];
+const articleSources = [
+	['why-earth-feels-still', 13],
+	['earth-moon', 7],
+	['atomic-scale', 5],
+	['empty-space-in-atoms', 5]
+];
 for (const route of [
 	'/',
 	'/scale/',
 	'/orbit/',
 	'/articles/',
-	'/articles/why-earth-feels-still/',
+	...articleSources.map(([slug]) => `/articles/${slug}/`),
 	'/robots.txt',
 	'/sitemap.xml',
 	'/fonts/OFL.txt',
@@ -90,6 +96,7 @@ try {
 				path: `${folder}/${width}-${route === '/' ? 'home' : route.replaceAll('/', '')}.png`
 			});
 			if (route === '/') {
+				await expect(page.locator('.stories-band .article-card')).toHaveCount(4);
 				await page.getByRole('contentinfo').scrollIntoViewIfNeeded();
 				await page.screenshot({ path: `${folder}/${width}-footer.png` });
 			}
@@ -110,7 +117,16 @@ try {
 			'content',
 			'https://a2o.kr/og-default.png'
 		);
-		await expect(page.locator('#question-4 + p')).toContainText('지구 평균 지름의 약 18%');
+		await expect(page.locator('#question-4 + p')).toContainText('2,300km');
+		await expect(page.locator('.sources-disclosure')).toContainText('약 18%');
+		for (const speed of ['1,670', '107,000', '828,000']) {
+			await expect(page.locator('.motion-speeds')).toContainText(speed);
+		}
+		await expect(page.locator('.motion-speeds .approx')).toHaveText([
+			'시속 약',
+			'시속 약',
+			'시속 약'
+		]);
 		assert.equal(
 			JSON.parse(await page.locator('script[type="application/ld+json"]').textContent())['@type'],
 			'Article'
@@ -170,13 +186,9 @@ try {
 			await motionFigure.getByRole('slider').fill('1');
 			await expect(motionFigure).toHaveAttribute('data-playing', 'false');
 		}
-		await expect(page.locator('.article-sources li')).toHaveCount(10);
+		await expect(page.locator('.article-sources li')).toHaveCount(13);
 		await expect(page.locator('canvas')).toHaveCount(0);
-		for (const [slug, sourceCount] of [
-			['why-earth-feels-still', 10],
-			['earth-moon', 3],
-			['atomic-scale', 2]
-		]) {
+		for (const [slug, sourceCount] of articleSources) {
 			await page.goto(`${origin}/articles/${slug}/`);
 			await expect(page.locator('.article-header time')).toHaveCount(0);
 			await expect(page.locator('article summary').filter({ hasText: '자료 및 출처' })).toHaveCount(
@@ -202,6 +214,43 @@ try {
 				);
 			await page.screenshot({ path: `${folder}/${width}-${slug}-reading-flow.png` });
 		}
+		await page.goto(`${origin}/articles/empty-space-in-atoms/`);
+		await expect(page.locator('h1')).toHaveText('원자는 거의 빈 공간인데, 왜 책상은 단단할까?');
+		const atomicDistance = page.locator('.atomic-distance');
+		await expect(atomicDistance.locator('.scale-status')).toContainText('십자');
+		await atomicDistance.getByRole('slider').fill('0.8');
+		await expect(atomicDistance.locator('.nucleus-marker')).toHaveCount(0);
+		await expect(atomicDistance.locator('.scale-status')).toContainText('서서히 눈에 보이기 시작');
+		await atomicDistance.screenshot({ path: `${folder}/${width}-nucleus-emerging.png` });
+		await atomicDistance.getByRole('button', { name: '핵 가까이', exact: true }).click();
+		await expect(atomicDistance.locator('.scale-status')).toContainText('1cm 구슬 모형');
+		assert.ok(
+			Math.abs((await atomicDistance.locator('circle.nucleus').boundingBox()).width - 96 / 2.54) <
+				0.1
+		);
+		await atomicDistance.screenshot({ path: `${folder}/${width}-nucleus-close.png` });
+		await atomicDistance.getByRole('button', { name: '315m까지 보기', exact: true }).click();
+		await expect(atomicDistance.locator('.scale-status')).toContainText('십자');
+		const probability = page.locator('.atomic-probability');
+		await expect(probability.locator('output')).toHaveText('약 315m');
+		await expect(probability.locator('.probability-result')).toContainText('10.8%');
+		await probability.getByRole('slider').fill('5');
+		await expect(probability.locator('.probability-result')).toContainText('0.1%');
+		await probability.screenshot({ path: `${folder}/${width}-electron-probability.png` });
+		await page.goto(`${origin}/articles/earth-moon/`);
+		const balls = page.locator('.earth-moon-balls');
+		await balls.getByRole('button', { name: '1m', exact: true }).click();
+		await expect(balls.getByRole('status')).toContainText('너무 가까워요');
+		await balls.getByRole('button', { name: '약 7.2m', exact: true }).click();
+		await expect(balls.getByRole('status')).toContainText('맞았어요');
+		await expect(balls.locator('.solution')).toBeVisible();
+		await balls.screenshot({ path: `${folder}/${width}-earth-moon-balls.png` });
+		await page.goto(`${origin}/articles/atomic-scale/`);
+		await expect(page.locator('.atom-ball-moon')).toContainText('3,800');
+		await expect(page.locator('.atom-ball-moon [data-body="moon"]')).toBeVisible();
+		await page
+			.locator('.atom-ball-moon')
+			.screenshot({ path: `${folder}/${width}-atom-ball-moon.png` });
 		await page.goto(`${origin}/orbit/`);
 		await expect(page.getByTestId('orbit-explorer')).toHaveAttribute('data-status', 'ready');
 		const canvas = page.getByTestId('orbit-canvas');

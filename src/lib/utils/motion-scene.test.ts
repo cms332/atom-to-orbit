@@ -7,7 +7,7 @@ import {
 	MOTION_VIEW_BOX
 } from './motion-scene';
 import { solarAUPerYear } from './orbit-model';
-import { motionMeasurements, tenSecondTravelMeters } from '$lib/data/motion';
+import { motionMeasurements, tenSecondTravelMeters, hourlySpeedLabel } from '$lib/data/motion';
 import { motionArticle } from '$lib/content/motion-article';
 import { objects, sourceById } from '$lib/data/science';
 
@@ -24,6 +24,17 @@ describe('article motion science and reference frames', () => {
 			for (let axis = 0; axis < 2; axis++)
 				expect(a.earth[axis] - a.sun[axis]).toBeCloseTo(b.earth[axis] - b.sun[axis], 9);
 		}
+	});
+	it('converts the elementary speed display to hourly units without changing the SI measurements', () => {
+		for (const [index, value] of [1670, 107208, 828000].entries()) {
+			expect(motionMeasurements[index].metersPerSecond * 3.6).toBeCloseTo(value, 8);
+		}
+		expect(motionMeasurements.map(hourlySpeedLabel)).toEqual(['1,670', '107,000', '828,000']);
+		expect(motionMeasurements.map((item) => [item.displayValue, item.displayUnit])).toEqual([
+			['1,670', 'km/h'],
+			['29.78', 'km/s'],
+			['230', 'km/s']
+		]);
 	});
 	it('keeps the galactic origin fixed and opens the one-orbit path by the displayed solar displacement', () => {
 		const start = motionPositions(0, 'galactic'),
