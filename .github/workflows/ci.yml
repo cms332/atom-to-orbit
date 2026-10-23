@@ -35,6 +35,10 @@ jobs:
         run: bun run lint
       - name: Unit tests
         run: bun run test
+      - name: Container cleanup safety tests
+        run: |
+          python3 -B -m unittest discover -s deploy -p 'test_prune_containers.py' -v
+          bash -n deploy/release.sh
       - name: Static build
         run: bun run build
       - name: Install test browser
