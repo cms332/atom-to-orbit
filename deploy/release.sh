@@ -20,21 +20,23 @@ healthy() {
 }
 if [ "$action" = status ] || [ "$action" = tls ]; then proxy "$action"; exit; fi
 if [ "$action" = rollback ]; then
-  [ -s state/previous ] || { echo 'No previous A2O release'; exit 1; }
-  release=$(cat state/previous)
-  [[ "$release" =~ ^[0-9]{8}T[0-9]{6}Z$ ]] || exit 1
-  target="a2o-$release"
-  docker start "$target" >/dev/null
-  healthy "$target" || { echo 'Previous A2O target is unhealthy'; exit 1; }
-  proxy switch "$target"
-  old=$(cat state/current)
-  printf '%s\n' "$old" > state/previous
-  printf '%s\n' "$release" > state/current
-  echo "A2O restored to $release"
-  exit
+  echo 'Only the current container is retained. Redeploy a reviewed Git commit to restore a version.'
+  exit 1
 fi
 [ "$action" = deploy ] || { echo 'Usage: release.sh deploy RELEASE | rollback | status | tls'; exit 1; }
 [[ "$release" =~ ^[0-9]{8}T[0-9]{6}Z$ ]] || { echo 'Invalid release'; exit 1; }
+[ -f "$ROOT/prune-containers.py" ] || { echo 'Missing single-container cleanup helper'; exit 1; }
+finish_deploy() {
+  local result=$?
+  trap - EXIT
+  if ! python3 "$ROOT/prune-containers.py" a2o --apply --lock-held; then
+    echo 'Container cleanup refused; inspect deployment state before retrying'
+    [ "$result" -ne 0 ] || result=1
+  fi
+  [ "$result" -ne 0 ] || echo "DEPLOYED A2O $release"
+  exit "$result"
+}
+trap finish_deploy EXIT
 python3 "$ROOT/bootstrap.py" prepare "$release"
 [ ! -e "releases/$release" ] || { echo 'Release already exists'; exit 1; }
 python3 - "$ROOT/uploads/$release.tar.gz" <<'PY'
@@ -65,8 +67,6 @@ if ! proxy switch "$target"; then
   echo 'A2O switch failed; previous route restored when available'
   exit 1
 fi
-[ -z "$old" ] || printf '%s\n' "$old" > state/previous
 printf '%s\n' "$release" > state/current
 proxy tls
 python3 "$ROOT/bootstrap.py" verify "$release"
-echo "DEPLOYED A2O $release"
