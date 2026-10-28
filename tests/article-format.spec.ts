@@ -19,7 +19,9 @@ test('article format and source disclosures are consistent across all articles',
 		await expect(page.locator('article summary').filter({ hasText: '자료 및 출처' })).toHaveCount(
 			1
 		);
-		await expect(page.locator('article summary')).toHaveCount(article.diagram !== 'moon' ? 3 : 2);
+		await expect(page.locator('article summary')).toHaveCount(
+			['moon', 'starlight'].includes(article.diagram) ? 2 : 3
+		);
 		for (const selector of [
 			'.article-header',
 			'.article-nav',

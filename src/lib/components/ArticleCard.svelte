@@ -3,6 +3,7 @@
 	import Diagram from './Diagram.svelte';
 	import MotionThumbnail from './MotionThumbnail.svelte';
 	import AtomicSpaceThumbnail from './AtomicSpaceThumbnail.svelte';
+	import StarlightThumbnail from './StarlightThumbnail.svelte';
 	let { article, headingLevel = 3 }: { article: Article; headingLevel?: 2 | 3 } = $props();
 </script>
 
@@ -12,7 +13,8 @@
 		aria-labelledby={`article-title-${article.slug}`}
 		aria-describedby={`article-intro-${article.slug}`}
 		><div class="article-art">
-			{#if article.diagram === 'atomic-space'}<AtomicSpaceThumbnail
+			{#if article.diagram === 'starlight'}<StarlightThumbnail
+				/>{:else if article.diagram === 'atomic-space'}<AtomicSpaceThumbnail
 				/>{:else if article.diagram === 'motion'}<MotionThumbnail
 				/>{:else if article.diagram === 'atom'}<Diagram kind="atom" />{:else}<svg
 					viewBox="0 0 440 200"
