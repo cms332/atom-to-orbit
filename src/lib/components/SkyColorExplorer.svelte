@@ -14,6 +14,9 @@
 	let timers: ReturnType<typeof setTimeout>[] = [];
 	const sample = $derived(sampleDirectBeam(elevation));
 	const explanation = $derived(skyExplanation(elevation));
+	const heightLabel = $derived(
+		elevation >= 50 ? '높아요' : elevation <= 15 ? '낮아요' : '중간쯤이에요'
+	);
 	function stop() {
 		timers.forEach(clearTimeout);
 		timers = [];
@@ -77,8 +80,12 @@
 	data-emphasis={emphasis}
 	aria-labelledby={`${id}-title`}
 >
-	<h3 id={`${id}-title`}>같은 햇빛, 달라지는 길</h3>
-	<p class="instruction">태양을 낮춰 보세요. 공기는 그대로인데 빛의 길이 길어져요.</p>
+	<h3 id={`${id}-title`}>태양을 낮추면 빛의 길은 어떻게 달라질까요?</h3>
+	<p class="instruction">
+		{mounted
+			? '아래 조절 막대로 태양의 높이를 바꿔 보세요.'
+			: '태양이 높을 때와 낮을 때의 그림을 비교해 보세요.'} 공기 속을 지나는 선의 길이를 살펴보세요.
+	</p>
 	{#if mounted}
 		<div class="presets" role="group" aria-label="태양의 높이 고르기">
 			<button type="button" aria-pressed={elevation === 70} onclick={() => setElevation(70)}
@@ -90,7 +97,7 @@
 		</div>
 		<div class="range-label">
 			<label for={`${id}-height`}>태양의 높이</label><output for={`${id}-height`}
-				>{elevation}°</output
+				>{heightLabel}</output
 			>
 		</div>
 		<input
@@ -100,6 +107,7 @@
 			max="80"
 			step="1"
 			value={elevation}
+			aria-valuetext={heightLabel}
 			oninput={(event) => setElevation(event.currentTarget.valueAsNumber, false)}
 			onchange={() => {
 				live = explanation;
@@ -111,12 +119,18 @@
 	<p class="diagram-heading">공기 속에서는 어떤 일이 일어날까요?</p>
 	<SkyRayDiagram {elevation} {emphasis} />
 	<ol class="ray-legend">
-		<li><strong>하늘에서 흩어져 오는 빛</strong><span>공기에서 방향을 바꿔 눈으로 와요.</span></li>
-		<li><strong>공기를 통과한 햇빛</strong><span>곧장 지나온 빛을 흰 면에서 비교해요.</span></li>
+		<li>
+			<strong>하늘에서 우리 눈으로 오는 빛</strong><span>공기에서 방향을 바꿔 눈으로 와요.</span>
+		</li>
+		<li>
+			<strong>공기를 지나온 햇빛</strong><span
+				>곧장 통과한 빛을 흰 면에서 비교해요. 태양이 낮으면 더 긴 길을 지나와요.</span
+			>
+		</li>
 	</ol>
 	<p class="small">
-		점선은 파란 계열, 짧은 점선은 초록 계열, 실선은 빨간 계열이에요. 빨간빛도 일부 흩어지고,
-		파란빛도 일부 통과해요.
+		점선은 파란빛, 짧은 점선은 초록빛, 실선은 빨간빛이에요. 빨간빛도 일부 흩어지고, 파란빛도 일부
+		통과해요.
 	</p>
 	{#if mounted}
 		<div class="actions">
@@ -146,6 +160,10 @@
 			아닙니다. 공기층의 두께와 물체 크기는 알아보기 쉽게 그렸어요.
 		</p>
 		<ArticleDisclosure class="model-notes" label="그림의 계산 방법">
+			<p>
+				현재 태양의 높이는 {elevation}°입니다. 아래에서 색깔별로 얼마나 곧장 통과하는지 비교할 수
+				있어요.
+			</p>
 			<p>
 				그림의 색은 설명을 위해 정했습니다. 아래 계산값으로 하늘색을 만든 것은 아닙니다. 빛의 경로
 				그림도 실제 지구의 크기·거리 비례가 아닙니다.

@@ -5,7 +5,9 @@ import {
 	lightTargets,
 	lightTravelSeconds,
 	clampLightProgress,
-	lightElapsedLabel
+	lightElapsedLabel,
+	lightElapsedReading,
+	lightElapsedParts
 } from './starlight';
 import { sourceById } from './science';
 
@@ -36,5 +38,26 @@ describe('source-backed light travel model', () => {
 		expect(
 			lightTargets.filter((target) => target.kind === '은하').map((target) => target.id)
 		).toEqual(['andromeda']);
+	});
+	it('keeps the moving time readout proportional and consistent with arrival cards', () => {
+		const halfway = ['약 0.6초', '약 4분 10초', '약 2.1년', '약 4.3년', '약 125.0만 년'];
+		const starts = ['약 0.0초', '약 0분 00초', '약 0.0년', '약 0.0년', '약 0.0만 년'];
+		for (const [index, target] of lightTargets.entries()) {
+			expect(lightElapsedReading(target, 0)).toBe(starts[index]);
+			expect(lightElapsedReading(target, 0.5)).toBe(halfway[index]);
+			expect(lightElapsedReading(target, 1)).toBe(index === 4 ? '약 250.0만 년' : target.timeLabel);
+		}
+		expect(lightElapsedLabel(lightTargets[1], 1)).toBe('8분 19초');
+		expect(lightTravelSeconds(lightTargets[1], 0.5)).toBeCloseTo(249.502391918, 8);
+	});
+	it('keeps the same numeric slots, decimal precision and unit across readout changes', () => {
+		const andromeda = lightTargets[4];
+		for (const amount of [0, 0.1, 9.9, 10, 79.6, 80, 99.9, 100, 250]) {
+			const parts = lightElapsedParts(andromeda, amount / 250);
+			expect(parts).toEqual({ value: amount.toFixed(1), unit: '만 년', widthCh: 5 });
+		}
+		expect(lightElapsedReading(lightTargets[1], 240 / lightTravelSeconds(lightTargets[1]))).toBe(
+			'약 4분 00초'
+		);
 	});
 });

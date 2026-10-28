@@ -23,6 +23,7 @@ export interface Article {
 		paragraphs?: string[];
 		keyPoint?: string;
 		aside?: { title: string; paragraphs: string[] };
+		details?: { title: string; paragraphs: string[] };
 		sourceIds?: string[];
 		visual?:
 			| 'sky-colors'

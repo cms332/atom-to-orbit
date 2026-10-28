@@ -63,10 +63,10 @@ export function sampleDirectBeam(elevationDeg: number) {
 }
 export function skyExplanation(elevationDeg: number): string {
 	if (elevationDeg >= 50)
-		return '햇빛이 비교적 짧은 공기 길을 지나요. 공기에서 흩어진 파란빛 일부가 우리 눈으로 와요.';
+		return '햇빛이 공기 속을 비교적 짧게 지나와요. 흩어진 파란빛의 일부가 우리 눈으로 와요.';
 	if (elevationDeg <= 15)
-		return '햇빛이 더 긴 공기 길을 지나요. 곧장 통과한 빛에는 빨강·주황 계열이 상대적으로 더 많이 남아요.';
-	return '태양이 낮아질수록 빛이 지나는 공기 길이 길어져요.';
+		return '길게 지나오는 동안 파란빛이 더 많이 다른 방향으로 흩어져요. 곧장 통과한 빛에는 빨강·주황빛이 두드러져요.';
+	return '태양이 낮아질수록 공기 속을 지나는 길이 길어져요.';
 }
 
 // A fixed, deliberately exaggerated curved air layer. This is illustrative geometry,

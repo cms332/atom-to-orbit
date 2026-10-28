@@ -457,7 +457,7 @@ export function createOrbitRenderer(
 			const journey = preset === 'journey';
 			target.z = length * (journey ? 0.42 : 0.5);
 			// Look across the trajectory instead of straight down its axis.
-			// Story chapter 3 keeps the same viewing angle on desktop and mobile.
+			// Story chapter 4 keeps the former chapter-3 viewing angle on desktop and mobile.
 			const direction = journey
 				? new THREE.Vector3(1, 0.275, -0.2625).normalize()
 				: new THREE.Vector3(1, 0.52, 0.18).normalize();
