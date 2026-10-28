@@ -213,3 +213,14 @@ NPM 내부 모듈 API는 현재 설치 버전에서 검증한다. NPM 업그레�
 - 이전 A2O 컨테이너 `a2o-20261022T205611Z`를 안전 정리했고 `a2o-20261028T045511Z`만 정상 실행 중이다. HGI preview도 기존 최신 1개를 유지한다.
 - GitHub production Deployment `7377535606`은 공개 검증 후 success로 기록했다. `deployed-20261028T045511Z` 태그는 실제 배포 소스를 가리킨다. 후속 문서 기록 커밋은 별도이며 실제 배포 SHA를 소급 변경하지 않는다.
 - 증거: `artifacts/starlight-deployment/` 아래 `source-ci.json`, `source-ci.log`, `metadata-and-assets.json`, `server-audit-summary.json`, `github-deployment-success.json`, `public-20261028T045511Z/verification.json` 및 PC·모바일 캡처. 비공개 서버 감사 원본과 접근 자격 증명은 공개 저장소에 넣지 않는다.
+
+## 검토한 기사·모션 개선 공개 배포 — 2026-10-28 (KST)
+
+- 소유자의 배포 지시에 따라 PR #13을 병합하고 정확한 main 소스의 CI 성공 후 배포했다. 실제 운영 소스는 `38b9559f17c1c7fadee54a8048a1ad8e498e6e74`이며 CI는 [40693127260](https://github.com/cms332/atom-to-orbit/actions/runs/40693127260)다. 타입·서식·72개 단위 검사·9개 컨테이너 정리 안전 검사·정적 빌드와 PC/모바일 브라우저 100개(기존 96개 + 궤도 4개)가 통과했다.
+- 릴리스 `20261028T131045Z`, 소스 패키지 SHA-256 `27e81e2deb0eae85daf3af479cd7806ca64d6f3d02924d0b9ec216c9d1956504`, 빌드 시각 `2026-10-28T13:11:22.787Z`. 공개 build-info의 SHA·릴리스·해시가 배포 패키지와 일치한다.
+- 별빛 기사 독해 개선·10초 재생·안정된 경과 시간 표시·도착 보기 제거, 하늘색 기사 독해·다채로운 정답 꽃가루, 궤도 이야기 3장 은하 구도·4장 이전 3장 모션을 반영했다.
+- 공개 HTTP 경로 15개와 PC 1440×1000 / 모바일 360×800의 여섯 기사·기존 탐험기 검증을 통과했다. 실제 canvas 꽃가루 픽셀, 별빛 중간 경과 시간·재생·정지·도착, 궤도 3/4 프리셋·모바일 천체 선택 후 설정 닫힘·6장 자취를 확인했다. 페이지 오류·실패한 자원 요청은 0개이며 실제 공개 캡처를 검토했다. 모바일은 Chromium 터치 에뮬레이션이다.
+- 이전 JS 주소 36개와 네이버 확인 파일 바이트를 보존했다. 다른 컨테이너 22개와 기존 프록시 설정 6개가 유지됐다. HGI·Umami·전용 PostgreSQL·DNS는 변경하지 않았다.
+- A2O는 `a2o-20261028T131045Z`만 정상 실행하고, HGI preview도 기존 최신 1개를 유지한다. 배포 전 A2O 컨테이너는 기존 정리 절차로 제거했다.
+- GitHub production Deployment `7386332540`의 성공 기록과 `deployed-20261028T131045Z` 태그는 위 실제 소스를 가리킨다. 이 후속 문서 기록은 운영 소스를 변경하지 않는다.
+- 증거: `artifacts/reading-motion-deployment/`의 CI·메타데이터·기존 자원·서버 감사 요약·단일 컨테이너 결과·GitHub Deployment 및 `public-20261028T131045Z/verification.json`과 캡처. 비공개 서버 감사 원본과 자격 증명은 공개 저장소에 포함하지 않는다.
