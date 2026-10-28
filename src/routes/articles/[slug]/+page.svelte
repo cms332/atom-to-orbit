@@ -13,6 +13,9 @@
 	import EarthMoonBalls from '$lib/components/EarthMoonBalls.svelte';
 	import LightTravelExplorer from '$lib/components/LightTravelExplorer.svelte';
 	import StarlightQuiz from '$lib/components/StarlightQuiz.svelte';
+	import SkyColorExplorer from '$lib/components/SkyColorExplorer.svelte';
+	import SkyComparison from '$lib/components/SkyComparison.svelte';
+	import SkyQuiz from '$lib/components/SkyQuiz.svelte';
 	import { sourceById } from '$lib/data/science';
 	import { articles } from '$lib/content/articles';
 	import type { PageData } from './$types';
@@ -115,7 +118,7 @@
 							<h3>{section.aside.title}</h3>
 							{#each section.aside.paragraphs as paragraph (paragraph)}<p>{paragraph}</p>{/each}
 						</aside>{/if}
-					{#if article.diagram === 'starlight'}<div
+					{#if article.diagram === 'starlight' || article.diagram === 'sky-colors'}<div
 							class="section-references"
 							aria-label="이 내용의 근거"
 						>
@@ -126,6 +129,8 @@
 								>{/each}
 						</div>{/if}
 					{#if section.visual === 'light-travel'}<LightTravelExplorer />{/if}
+					{#if section.visual === 'sky-colors'}<SkyColorExplorer />{/if}
+					{#if section.visual === 'sky-comparison'}<SkyComparison />{/if}
 					{#if section.visual === 'inertia'}<TrainInertia
 						/>{:else if section.visual === 'frames'}<MotionFrames
 						/>{:else if section.visual === 'atomic-distance'}<AtomicSpaceScale
@@ -143,9 +148,34 @@
 					{#if article.closing.keyPoint}<p class="key-point">{article.closing.keyPoint}</p>{/if}
 				</section>{/if}
 			{#if article.diagram === 'starlight'}<StarlightQuiz />{/if}
+			{#if article.diagram === 'sky-colors'}
+				<p class="note">
+					관찰할 때는 태양 자체를 보지 말고 주변 하늘과 구름을 살펴보세요. 해 질 무렵에도 태양을
+					직접 바라보지 않습니다. <a
+						href="#source-sky-safety"
+						aria-label="태양 관찰 주의사항의 출처">[5]</a
+					>
+				</p>
+				<ArticleDisclosure label="왜 보라색 하늘은 아닐까요?">
+					<p>
+						보랏빛은 파란빛보다 파장이 짧아 더 잘 흩어집니다. 하지만 하늘색은 산란만으로 정해지지
+						않아요. 햇빛에 들어 있는 색의 양과 우리 눈이 색을 느끼는 방식도 함께 영향을 줍니다. 그
+						결과 보통 파란색으로 보입니다. <a href="#source-sky-metoffice">설명의 근거 ↗</a>
+					</p>
+				</ArticleDisclosure>
+				<SkyQuiz />
+			{/if}
 			<aside class="explorer-invitation">
 				<h2>직접 탐험해 보세요.</h2>
-				{#if article.diagram === 'starlight'}
+				{#if article.diagram === 'sky-colors'}
+					<p>
+						지구의 공기를 만나기 전, 빛은 얼마나 긴 여행을 했을까요? 달빛부터 멀리 있는 은하의
+						빛까지 따라가 보세요.
+					</p>
+					<a href="/articles/how-old-is-starlight/#question-3" class="primary"
+						>별빛의 여행 이어보기 ↗</a
+					>
+				{:else if article.diagram === 'starlight'}
 					<p>달빛이 건너온 길은 얼마나 멀까요? 지구와 달을 같은 눈금 위에 놓고 비교해 보세요.</p>
 					<a href="/scale/?object=earth" class="primary">크기 탐험으로 ↗</a>
 				{:else if article.diagram === 'motion'}
