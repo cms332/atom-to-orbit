@@ -13,6 +13,7 @@ assert.match(info.release, /^\d{8}T\d{6}Z$/);
 if (process.env.A2O_EXPECTED_COMMIT) assert.equal(info.commit, process.env.A2O_EXPECTED_COMMIT);
 const responses = [];
 const articleSources = [
+	['how-old-is-starlight', 11],
 	['why-earth-feels-still', 13],
 	['earth-moon', 7],
 	['atomic-scale', 5],
@@ -96,7 +97,9 @@ try {
 				path: `${folder}/${width}-${route === '/' ? 'home' : route.replaceAll('/', '')}.png`
 			});
 			if (route === '/') {
-				await expect(page.locator('.stories-band .article-card')).toHaveCount(4);
+				await expect(page.locator('.stories-band .article-card')).toHaveCount(
+					articleSources.length
+				);
 				await page.getByRole('contentinfo').scrollIntoViewIfNeeded();
 				await page.screenshot({ path: `${folder}/${width}-footer.png` });
 			}
@@ -251,6 +254,36 @@ try {
 		await page
 			.locator('.atom-ball-moon')
 			.screenshot({ path: `${folder}/${width}-atom-ball-moon.png` });
+		await page.goto(`${origin}/articles/how-old-is-starlight/`);
+		await expect(page.locator('h1')).toHaveText('우리가 보는 별빛은 얼마나 오래전의 빛일까?');
+		const light = page.getByTestId('light-travel');
+		await expect(page.locator('.light-table tbody tr')).toHaveCount(5);
+		await expect(light).toHaveAttribute('data-progress', '0');
+		for (const name of ['달', '태양', '프록시마 센타우리', '시리우스', '안드로메다은하']) {
+			await light.getByRole('button', { name, exact: true }).click();
+			await light.getByRole('button', { name: '빛의 길 따라가기' }).click();
+			await expect(light).toHaveAttribute('data-progress', '1');
+			await expect(light.getByTestId('light-arrival')).toContainText('전의 소식입니다');
+		}
+		await light.getByRole('button', { name: '시리우스', exact: true }).click();
+		await page.emulateMedia({ reducedMotion: 'no-preference' });
+		await light.getByRole('button', { name: '빛의 길 따라가기' }).click();
+		await expect
+			.poll(async () => Number(await light.getAttribute('data-progress')))
+			.toBeGreaterThan(0.1);
+		await light.getByRole('button', { name: '일시 정지' }).click();
+		const lightPaused = await light.getAttribute('data-progress');
+		await page.waitForTimeout(250);
+		await expect(light).toHaveAttribute('data-progress', lightPaused);
+		await light.getByRole('button', { name: '빛의 길 따라가기' }).click();
+		await expect(light).toHaveAttribute('data-progress', '1');
+		await light.screenshot({ path: `${folder}/${width}-starlight.png` });
+		await page
+			.locator('.starlight-quiz')
+			.getByRole('button', { name: '10년 전', exact: true })
+			.click();
+		await expect(page.locator('.starlight-quiz [role="status"]')).toContainText('맞아요');
+		await page.emulateMedia({ reducedMotion: 'reduce' });
 		await page.goto(`${origin}/orbit/`);
 		await expect(page.getByTestId('orbit-explorer')).toHaveAttribute('data-status', 'ready');
 		const canvas = page.getByTestId('orbit-canvas');

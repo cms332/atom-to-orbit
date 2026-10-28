@@ -3,6 +3,7 @@ import { planetObjects, planetSources } from './science-planets';
 import { motionSources } from './motion';
 import { BOHR_RADIUS, atomicSpaceSources } from './atomic-space';
 import { earthMoonSources } from './earth-moon-sources';
+import { starlightSources } from './starlight';
 export { BOHR_RADIUS } from './atomic-space';
 export type DimensionKind = 'diameter' | 'length' | 'height' | 'distance';
 export type ApproximationKind =
@@ -101,7 +102,8 @@ export const sources: ScienceSource[] = [
 	...planetSources,
 	...motionSources,
 	...atomicSpaceSources,
-	...earthMoonSources
+	...earthMoonSources,
+	...starlightSources
 ];
 export function sourceById(id: string): ScienceSource {
 	const source = sources.find((s) => s.id === id);

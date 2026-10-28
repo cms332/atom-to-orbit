@@ -2,6 +2,7 @@ import { motionArticle } from './motion-article';
 import { atomicSpaceArticle } from './atomic-space-article';
 import { atomicScaleArticle } from './atomic-scale-article';
 import { earthMoonArticle } from './earth-moon-article';
+import { starlightArticle } from './starlight-article';
 
 export interface Article {
 	slug: string;
@@ -11,7 +12,7 @@ export interface Article {
 	intro: string;
 	date?: string;
 	sourceIds: string[];
-	diagram: 'moon' | 'atom' | 'motion' | 'atomic-space';
+	diagram: 'moon' | 'atom' | 'motion' | 'atomic-space' | 'starlight';
 	opening?: string[];
 	sourceNote?: string;
 	closing?: { title: string; paragraphs: string[]; keyPoint?: string };
@@ -20,8 +21,10 @@ export interface Article {
 		text: string;
 		paragraphs?: string[];
 		keyPoint?: string;
+		aside?: { title: string; paragraphs: string[] };
 		sourceIds?: string[];
 		visual?:
+			| 'light-travel'
 			| 'inertia'
 			| 'frames'
 			| 'atomic-distance'
@@ -35,6 +38,7 @@ export interface Article {
 	takeaway: string;
 }
 export const articles: Article[] = [
+	starlightArticle,
 	atomicSpaceArticle,
 	motionArticle,
 	earthMoonArticle,

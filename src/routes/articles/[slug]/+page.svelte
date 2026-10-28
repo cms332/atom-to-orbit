@@ -11,6 +11,8 @@
 	import AtomBallMoon from '$lib/components/AtomBallMoon.svelte';
 	import LogScaleSteps from '$lib/components/LogScaleSteps.svelte';
 	import EarthMoonBalls from '$lib/components/EarthMoonBalls.svelte';
+	import LightTravelExplorer from '$lib/components/LightTravelExplorer.svelte';
+	import StarlightQuiz from '$lib/components/StarlightQuiz.svelte';
 	import { sourceById } from '$lib/data/science';
 	import { articles } from '$lib/content/articles';
 	import type { PageData } from './$types';
@@ -109,6 +111,21 @@
 					<p>{section.text}</p>
 					{#each section.paragraphs ?? [] as paragraph (paragraph)}<p>{paragraph}</p>{/each}
 					{#if section.keyPoint}<p class="key-point">{section.keyPoint}</p>{/if}
+					{#if section.aside}<aside>
+							<h3>{section.aside.title}</h3>
+							{#each section.aside.paragraphs as paragraph (paragraph)}<p>{paragraph}</p>{/each}
+						</aside>{/if}
+					{#if article.diagram === 'starlight'}<div
+							class="section-references"
+							aria-label="이 내용의 근거"
+						>
+							{#each section.sourceIds ?? [] as id (id)}<a
+									href={`#source-${id}`}
+									aria-label={`출처 ${article.sourceIds.indexOf(id) + 1}: ${sourceById(id).label}`}
+									>[{article.sourceIds.indexOf(id) + 1}]</a
+								>{/each}
+						</div>{/if}
+					{#if section.visual === 'light-travel'}<LightTravelExplorer />{/if}
 					{#if section.visual === 'inertia'}<TrainInertia
 						/>{:else if section.visual === 'frames'}<MotionFrames
 						/>{:else if section.visual === 'atomic-distance'}<AtomicSpaceScale
@@ -125,9 +142,13 @@
 					{#each article.closing.paragraphs as paragraph (paragraph)}<p>{paragraph}</p>{/each}
 					{#if article.closing.keyPoint}<p class="key-point">{article.closing.keyPoint}</p>{/if}
 				</section>{/if}
+			{#if article.diagram === 'starlight'}<StarlightQuiz />{/if}
 			<aside class="explorer-invitation">
 				<h2>직접 탐험해 보세요.</h2>
-				{#if article.diagram === 'motion'}
+				{#if article.diagram === 'starlight'}
+					<p>달빛이 건너온 길은 얼마나 멀까요? 지구와 달을 같은 눈금 위에 놓고 비교해 보세요.</p>
+					<a href="/scale/?object=earth" class="primary">크기 탐험으로 ↗</a>
+				{:else if article.diagram === 'motion'}
 					<p>
 						태양과 여덟 행성의 움직임을 궤도 탐험기에서 이어 보세요. ‘태양계’와 ‘은하 궤적’을 오가며
 						같은 운동의 다른 모습을 만날 수 있습니다.
@@ -191,6 +212,20 @@
 {/key}
 
 <style>
+	.section-references {
+		display: flex;
+		gap: 4px;
+		margin-top: -8px;
+	}
+	.section-references a {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		min-width: 44px;
+		min-height: 44px;
+		font-size: 12px;
+		text-decoration: none;
+	}
 	.reading .key-point {
 		color: var(--ink);
 		font-weight: 650;
