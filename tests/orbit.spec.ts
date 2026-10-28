@@ -172,37 +172,42 @@ async function expectPausedStory(page: Page, title: string) {
 
 async function expectGalacticComposition(page: Page) {
 	const canvas = page.getByTestId('orbit-canvas');
-	await expect(canvas).toHaveAttribute('data-transitioning', 'false');
-	const composition = await canvas.evaluate((element) => {
-		const data = (element as HTMLCanvasElement).dataset;
-		const [x, y, width, height] = data.framingArea!.split(',').map(Number);
-		const [sunX, sunY, radius] = data.sunScreen!.split(',').map(Number);
-		const [tailX, tailY] = data.trailStartScreen!.split(',').map(Number);
-		return {
-			inside:
-				sunX - radius >= x &&
-				sunX + radius <= x + width &&
-				sunY - radius >= y &&
-				sunY + radius <= y + height,
-			portrait: width < height,
-			sunX: (sunX - x) / width,
-			sunY: (sunY - y) / height,
-			horizontalSpan: (sunX - tailX) / width,
-			verticalSpan: (sunY - tailY) / height
-		};
-	});
-	expect(composition.inside).toBe(true);
-	if (composition.portrait) {
-		expect(composition.sunX).toBeGreaterThan(0.6);
-		expect(composition.sunX).toBeLessThan(0.8);
-		expect(composition.sunY).toBeGreaterThan(0.6);
-		expect(composition.sunY).toBeLessThan(0.82);
-		expect(composition.verticalSpan).toBeGreaterThan(0.25);
-		expect(composition.horizontalSpan).toBeGreaterThan(0.25);
-	} else {
-		expect(composition.horizontalSpan).toBeGreaterThan(0.15);
-		expect(composition.verticalSpan).toBeGreaterThan(0.05);
-	}
+	await expect(page.locator('.story')).toHaveCount(0);
+	// Removing the caption schedules a ResizeObserver update and another rendered frame.
+	// Keep the same composition bounds, but wait for that layout to reach the canvas.
+	await expect(async () => {
+		await expect(canvas).toHaveAttribute('data-transitioning', 'false');
+		const composition = await canvas.evaluate((element) => {
+			const data = (element as HTMLCanvasElement).dataset;
+			const [x, y, width, height] = data.framingArea!.split(',').map(Number);
+			const [sunX, sunY, radius] = data.sunScreen!.split(',').map(Number);
+			const [tailX, tailY] = data.trailStartScreen!.split(',').map(Number);
+			return {
+				inside:
+					sunX - radius >= x &&
+					sunX + radius <= x + width &&
+					sunY - radius >= y &&
+					sunY + radius <= y + height,
+				portrait: width < height,
+				sunX: (sunX - x) / width,
+				sunY: (sunY - y) / height,
+				horizontalSpan: (sunX - tailX) / width,
+				verticalSpan: (sunY - tailY) / height
+			};
+		});
+		expect(composition.inside).toBe(true);
+		if (composition.portrait) {
+			expect(composition.sunX).toBeGreaterThan(0.6);
+			expect(composition.sunX).toBeLessThan(0.8);
+			expect(composition.sunY).toBeGreaterThan(0.6);
+			expect(composition.sunY).toBeLessThan(0.82);
+			expect(composition.verticalSpan).toBeGreaterThan(0.25);
+			expect(composition.horizontalSpan).toBeGreaterThan(0.25);
+		} else {
+			expect(composition.horizontalSpan).toBeGreaterThan(0.15);
+			expect(composition.verticalSpan).toBeGreaterThan(0.05);
+		}
+	}).toPass({ timeout: 10_000 });
 }
 
 test('continuous motion, three-button dock and inner-planet solar entry survive view changes and revisits', async ({
@@ -992,6 +997,8 @@ test('story framing adapts to tablet, landscape, chapter height and enlarged tex
 	for (let chapter = 2; chapter <= 5; chapter++) {
 		await page.getByRole('button', { name: '다음 이야기', exact: true }).click();
 		if (![3, 4, 5].includes(chapter)) continue;
+		// A click updates Svelte before the renderer publishes the next frame's telemetry.
+		await expect(canvas).toHaveAttribute('data-preset', chapter === 4 ? 'journey' : 'trail');
 		await expectUncoveredSun(page);
 		if (chapter === 4) {
 			const framing = await canvas.evaluate((element) => {
