@@ -93,7 +93,7 @@ test('motion article is discoverable, sourced and has valid article metadata', a
 	).toHaveAttribute('href', '/orbit/');
 	expect(await (await request.get('/sitemap.xml')).text()).toContain(`https://a2o.kr${route}`);
 	await page.goto('/articles/?topic=cosmos');
-	await expect(page.locator('.article-card')).toHaveCount(3);
+	await expect(page.locator('.article-card')).toHaveCount(4);
 	await expect(page.getByRole('heading', { name: title, exact: true })).toBeVisible();
 });
 

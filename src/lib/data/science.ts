@@ -4,6 +4,7 @@ import { motionSources } from './motion';
 import { BOHR_RADIUS, atomicSpaceSources } from './atomic-space';
 import { earthMoonSources } from './earth-moon-sources';
 import { starlightSources } from './starlight';
+import { skySources } from './sky-colors';
 export { BOHR_RADIUS } from './atomic-space';
 export type DimensionKind = 'diameter' | 'length' | 'height' | 'distance';
 export type ApproximationKind =
@@ -32,6 +33,7 @@ export interface ScaleObject {
 }
 const nasa = 'https://nssdc.gsfc.nasa.gov/planetary/factsheet/';
 export const sources: ScienceSource[] = [
+	...skySources,
 	{
 		id: 'nist',
 		label: 'NIST · 2022 CODATA',

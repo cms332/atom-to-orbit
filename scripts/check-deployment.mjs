@@ -13,6 +13,7 @@ assert.match(info.release, /^\d{8}T\d{6}Z$/);
 if (process.env.A2O_EXPECTED_COMMIT) assert.equal(info.commit, process.env.A2O_EXPECTED_COMMIT);
 const responses = [];
 const articleSources = [
+	['why-sky-blue-sunset-red', 9],
 	['how-old-is-starlight', 11],
 	['why-earth-feels-still', 13],
 	['earth-moon', 7],
@@ -254,6 +255,25 @@ try {
 		await page
 			.locator('.atom-ball-moon')
 			.screenshot({ path: `${folder}/${width}-atom-ball-moon.png` });
+		await page.goto(`${origin}/articles/why-sky-blue-sunset-red/`);
+		await expect(page.locator('h1')).toHaveText('하늘은 왜 파랗고, 노을은 왜 붉을까?');
+		const sky = page.getByTestId('sky-explorer');
+		await expect(sky).toHaveAttribute('data-elevation', '70');
+		const airShape = await sky.getByTestId('air-layer').getAttribute('d');
+		await sky.getByRole('button', { name: '태양이 낮을 때' }).click();
+		await expect(sky).toHaveAttribute('data-elevation', '5');
+		assert.equal(await sky.getByTestId('air-layer').getAttribute('d'), airShape);
+		await sky.getByRole('button', { name: '빛의 길 보기' }).click();
+		await expect(sky).toHaveAttribute('data-emphasis', 'all');
+		await sky.getByText('그림의 계산 방법', { exact: true }).click();
+		await expect(sky.locator('.transmission-table')).toContainText('10.0%');
+		await expect(sky.locator('.transmission-table')).toContainText('59.0%');
+		await sky.screenshot({ path: `${folder}/${width}-sky-colors.png` });
+		await page
+			.locator('.sky-quiz')
+			.getByRole('button', { name: /B 빛이/ })
+			.click();
+		await expect(page.locator('.sky-quiz [role="status"]')).toContainText('맞아요');
 		await page.goto(`${origin}/articles/how-old-is-starlight/`);
 		await expect(page.locator('h1')).toHaveText('우리가 보는 별빛은 얼마나 오래전의 빛일까?');
 		const light = page.getByTestId('light-travel');

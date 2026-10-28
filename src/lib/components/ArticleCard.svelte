@@ -4,6 +4,7 @@
 	import MotionThumbnail from './MotionThumbnail.svelte';
 	import AtomicSpaceThumbnail from './AtomicSpaceThumbnail.svelte';
 	import StarlightThumbnail from './StarlightThumbnail.svelte';
+	import SkyColorThumbnail from './SkyColorThumbnail.svelte';
 	let { article, headingLevel = 3 }: { article: Article; headingLevel?: 2 | 3 } = $props();
 </script>
 
@@ -13,7 +14,8 @@
 		aria-labelledby={`article-title-${article.slug}`}
 		aria-describedby={`article-intro-${article.slug}`}
 		><div class="article-art">
-			{#if article.diagram === 'starlight'}<StarlightThumbnail
+			{#if article.diagram === 'sky-colors'}<SkyColorThumbnail
+				/>{:else if article.diagram === 'starlight'}<StarlightThumbnail
 				/>{:else if article.diagram === 'atomic-space'}<AtomicSpaceThumbnail
 				/>{:else if article.diagram === 'motion'}<MotionThumbnail
 				/>{:else if article.diagram === 'atom'}<Diagram kind="atom" />{:else}<svg
