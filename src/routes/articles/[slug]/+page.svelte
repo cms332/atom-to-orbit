@@ -118,6 +118,9 @@
 							<h3>{section.aside.title}</h3>
 							{#each section.aside.paragraphs as paragraph (paragraph)}<p>{paragraph}</p>{/each}
 						</aside>{/if}
+					{#if section.details}<ArticleDisclosure label={section.details.title}>
+							{#each section.details.paragraphs as paragraph (paragraph)}<p>{paragraph}</p>{/each}
+						</ArticleDisclosure>{/if}
 					{#if article.diagram === 'starlight' || article.diagram === 'sky-colors'}<div
 							class="section-references"
 							aria-label="이 내용의 근거"

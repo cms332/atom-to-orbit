@@ -42,7 +42,7 @@ export const orbitChapters: {
 		takeaway: '태양계도 은하 속을 움직입니다.',
 		frame: 'galactic',
 		factor: 0.05,
-		view: 'journey'
+		view: 'trail'
 	},
 	{
 		title: '태양계의 다정한 동행',
@@ -50,7 +50,7 @@ export const orbitChapters: {
 		takeaway: '행성들은 태양 뒤에 한 줄로 따라붙지 않습니다.',
 		frame: 'galactic',
 		factor: 0.05,
-		view: 'formation'
+		view: 'journey'
 	},
 	{
 		title: '멀리까지 이어지는 발자취',

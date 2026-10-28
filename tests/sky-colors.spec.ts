@@ -28,9 +28,25 @@ test('sky article: fixed air layer, independent colors, accessible responsive fi
 	await expect(page.locator('.article-nav a')).toHaveCount(4);
 	await expect(page.locator('.sources-disclosure li')).toHaveCount(9);
 	await expect(page.locator('.sources-disclosure')).not.toHaveAttribute('open', '');
+	const wavelength = page
+		.locator('details')
+		.filter({ has: page.getByText('왜 파란빛이 더 잘 흩어질까요?', { exact: true }) });
+	await expect(wavelength).not.toHaveAttribute('open');
+	await expect(wavelength.locator('p').first()).not.toBeVisible();
+	await wavelength.locator('summary').click();
+	await expect(wavelength.locator('p').first()).toBeVisible();
+	await expect(wavelength).toContainText('파장');
+	await wavelength.locator('summary').click();
+	await expect(
+		page.getByRole('heading', { name: '잠깐! 파란빛은 어디로 갔을까요?' })
+	).toBeVisible();
 	const panel = page.getByTestId('sky-explorer');
 	await expect(panel).toHaveAttribute('data-elevation', '70');
 	await expect(panel).toHaveAttribute('data-emphasis', '');
+	await expect(panel.getByRole('slider')).toHaveAttribute('aria-valuetext', '높아요');
+	await expect(panel.locator('.range-label')).not.toContainText('°');
+	await expect(panel.locator('.transmission-table')).not.toBeVisible();
+	await expect(panel.locator('.model-notes')).not.toHaveAttribute('open');
 	const air = await panel.getByTestId('air-layer').getAttribute('d');
 	const high = await panel.locator('[data-band]').evaluateAll((lines) =>
 		lines.map((line) => ({
@@ -40,6 +56,7 @@ test('sky article: fixed air layer, independent colors, accessible responsive fi
 	);
 	await panel.getByRole('button', { name: '태양이 낮을 때' }).click();
 	await expect(panel).toHaveAttribute('data-elevation', '5');
+	await expect(panel.getByRole('slider')).toHaveAttribute('aria-valuetext', '낮아요');
 	await expect(panel.getByRole('button', { name: '태양이 낮을 때' })).toHaveAttribute(
 		'aria-pressed',
 		'true'
@@ -65,6 +82,7 @@ test('sky article: fixed air layer, independent colors, accessible responsive fi
 		await panel.screenshot({ path: `artifacts/sky-colors/${info.project.name}-${width}-low.png` });
 	}
 	await panel.getByText('그림의 계산 방법', { exact: true }).click();
+	await expect(panel.locator('.model-notes')).toContainText('현재 태양의 높이는 5°');
 	await expect(panel.locator('.transmission-table tbody tr')).toHaveCount(3);
 	await expect(panel.locator('.transmission-table')).toContainText('10.0%');
 	await expect(panel.locator('.transmission-table')).toContainText('59.0%');
@@ -153,10 +171,12 @@ test('reduced motion, quiz feedback and 200 percent text keep all information us
 	await quiz.getByRole('button', { name: /B 빛이/ }).focus();
 	await page.keyboard.press('Enter');
 	await expect(quiz.getByRole('status')).toContainText('맞아요');
+	await expect(quiz.getByTestId('quiz-confetti')).toBeVisible();
 	await quiz.screenshot({ path: `artifacts/sky-colors/${info.project.name}-quiz.png` });
-	await quiz.getByRole('button', { name: '다시 생각하기' }).click();
+	await quiz.getByRole('button', { name: '다시 풀기' }).click();
 	await expect(quiz.getByRole('status')).toHaveText('');
-	await expect(quiz.getByRole('button', { name: '다시 생각하기' })).toBeFocused();
+	await expect(quiz.getByRole('button', { name: /A 태양이/ })).toBeFocused();
+	await expect(quiz.getByRole('button', { name: '다시 풀기' })).toHaveCount(0);
 	await page.setViewportSize({ width: 320, height: 1000 });
 	await page.evaluate(() => {
 		const sizes = Array.from(document.querySelectorAll<HTMLElement>('article *'))
@@ -166,6 +186,130 @@ test('reduced motion, quiz feedback and 200 percent text keep all information us
 	});
 	expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
 	await panel.screenshot({ path: `artifacts/sky-colors/${info.project.name}-text200.png` });
+});
+
+test('quiz reset follows an answer and a correct answer celebrates once per attempt', async ({
+	page
+}, info) => {
+	await page.emulateMedia({ reducedMotion: 'no-preference' });
+	await page.clock.install();
+	await page.goto(route);
+	const quiz = page.locator('.sky-quiz');
+	await quiz.scrollIntoViewIfNeeded();
+	await page.clock.pauseAt(new Date(Date.now() + 1000));
+	const correct = quiz.getByRole('button', { name: /B 빛이/ });
+	const wrong = quiz.getByRole('button', { name: /A 태양이/ });
+	const reset = quiz.getByRole('button', { name: '다시 풀기' });
+	const confetti = quiz.getByTestId('quiz-confetti');
+	await expect(reset).toHaveCount(0);
+	await expect(confetti).toHaveCount(0);
+	await quiz.screenshot({ path: `artifacts/sky-quiz/${info.project.name}-initial.png` });
+	await wrong.click();
+	await expect(reset).toBeVisible();
+	await expect(confetti).toHaveCount(0);
+	const gap = await reset.evaluate((button) => {
+		const feedback = button.previousElementSibling!;
+		return button.getBoundingClientRect().top - feedback.getBoundingClientRect().bottom;
+	});
+	expect(gap).toBeGreaterThanOrEqual(16);
+	await correct.focus();
+	await correct.press('Enter');
+	await expect(quiz.getByRole('status')).toContainText('맞아요');
+	await expect(confetti).toHaveAttribute('aria-hidden', 'true');
+	// The optional renderer loads after answering; canvas sizing marks its first burst.
+	await expect
+		.poll(() => confetti.evaluate((element) => (element as HTMLCanvasElement).height))
+		.toBeGreaterThan(300);
+	expect(await confetti.evaluate((element) => getComputedStyle(element).pointerEvents)).toBe(
+		'none'
+	);
+	await page.clock.runFor(650);
+	const hues = await confetti.evaluate((element) => {
+		const canvas = element as HTMLCanvasElement;
+		const pixels = canvas.getContext('2d')!.getImageData(0, 0, canvas.width, canvas.height).data;
+		const bins = new Set<number>();
+		for (let i = 0; i < pixels.length; i += 4) {
+			if (pixels[i + 3] < 100) continue;
+			const [r, g, b] = [pixels[i], pixels[i + 1], pixels[i + 2]];
+			const max = Math.max(r, g, b),
+				min = Math.min(r, g, b),
+				delta = max - min;
+			if (delta < 80) continue;
+			const hue =
+				max === r ? (g - b) / delta : max === g ? 2 + (b - r) / delta : 4 + (r - g) / delta;
+			bins.add(Math.floor(((hue * 60 + 360) % 360) / 45));
+		}
+		return bins.size;
+	});
+	expect(hues).toBeGreaterThanOrEqual(6);
+	await quiz.screenshot({ path: `artifacts/confetti-remake/${info.project.name}-colorful.png` });
+	await page.clock.runFor(1000);
+	await correct.click();
+	await page.clock.runFor(2500);
+	await expect(confetti).toHaveCount(0);
+	await correct.click();
+	await expect(confetti).toHaveCount(0);
+	await reset.click();
+	await expect(wrong).toBeFocused();
+	await expect(quiz.locator('[aria-pressed="true"]')).toHaveCount(0);
+	await expect(reset).toHaveCount(0);
+	await correct.click();
+	await expect(confetti).toHaveCount(1);
+	await reset.click();
+	await expect(confetti).toHaveCount(0);
+	await correct.click();
+	await page.emulateMedia({ reducedMotion: 'reduce' });
+	await expect(confetti).toBeVisible();
+	await expect(quiz.getByRole('status')).toContainText('맞아요');
+	await page.clock.resume();
+	expect(
+		(
+			await new AxeBuilder({ page })
+				.include('.sky-quiz')
+				.withTags(['wcag2a', 'wcag2aa', 'wcag21aa'])
+				.analyze()
+		).violations
+	).toEqual([]);
+});
+
+test('requested confetti visibly animates even with reduced motion and clears on hiding', async ({
+	page
+}, info) => {
+	await page.emulateMedia({ reducedMotion: 'reduce' });
+	await page.goto(route);
+	const quiz = page.locator('.sky-quiz');
+	await quiz.getByRole('button', { name: /B 빛이/ }).click();
+	const confetti = quiz.getByTestId('quiz-confetti');
+	await expect(confetti).toBeVisible();
+	await expect
+		.poll(() =>
+			confetti.evaluate((element) => {
+				const canvas = element as HTMLCanvasElement;
+				const pixels = canvas
+					.getContext('2d')!
+					.getImageData(0, 0, canvas.width, canvas.height).data;
+				let visible = 0;
+				for (let i = 3; i < pixels.length; i += 4) if (pixels[i] > 100) visible++;
+				return visible;
+			})
+		)
+		.toBeGreaterThan(500);
+	const start = await confetti.evaluate((element) => (element as HTMLCanvasElement).toDataURL());
+	await expect
+		.poll(() => confetti.evaluate((element) => (element as HTMLCanvasElement).toDataURL()))
+		.not.toBe(start);
+	await quiz.screenshot({
+		path: `artifacts/confetti-remake/${info.project.name}-reduced-motion-playing.png`
+	});
+	await expect(confetti).toHaveCount(0);
+	await quiz.getByRole('button', { name: '다시 풀기' }).click();
+	await quiz.getByRole('button', { name: /B 빛이/ }).click();
+	await expect(confetti).toBeVisible();
+	await page.evaluate(() => {
+		Object.defineProperty(document, 'hidden', { configurable: true, get: () => true });
+		document.dispatchEvent(new Event('visibilitychange'));
+	});
+	await expect(confetti).toHaveCount(0);
 });
 
 test('no JavaScript retains both sky states, comparisons, sources and a readable answer', async ({

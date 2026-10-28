@@ -622,7 +622,7 @@ test('story toggles progress and pause without leaving the current chapter or re
 	await expect(story.locator('rect')).toHaveCount(2);
 	for (let chapter = 2; chapter <= 3; chapter++)
 		await page.getByRole('button', { name: '다음 이야기', exact: true }).click();
-	await expect(canvas).toHaveAttribute('data-preset', 'journey');
+	await expect(canvas).toHaveAttribute('data-preset', 'trail');
 	await expect(canvas).toHaveAttribute('data-transitioning', 'false');
 	await page.waitForTimeout(4000);
 	const camera = await canvas.getAttribute('data-camera');
@@ -639,7 +639,7 @@ test('story toggles progress and pause without leaving the current chapter or re
 	// Longer than a complete chapter: captions pause while the requested 3D motion continues.
 	await page.waitForTimeout(12000);
 	await expect(page.locator('.story h2')).toHaveText('태양과 함께, 은하 속으로');
-	await expect(canvas).toHaveAttribute('data-preset', 'journey');
+	await expect(canvas).toHaveAttribute('data-preset', 'trail');
 	await expect(canvas).toHaveAttribute('data-camera', camera!);
 	await expect(canvas).toHaveAttribute('data-frame', frame!);
 	await expect(canvas).toHaveAttribute('data-framing-area', area!);
@@ -679,8 +679,8 @@ test('all six story chapters advance automatically with moving geometry under re
 	expect(Number(await canvas.getAttribute('data-year'))).toBeGreaterThan(firstTime);
 	for (const [index, title, preset, frame, factor] of [
 		[2, '곁을 지나는 이웃들', 'top', 'solar', '0.05'],
-		[3, '태양과 함께, 은하 속으로', 'journey', 'galactic', '0.05'],
-		[4, '태양계의 다정한 동행', 'formation', 'galactic', '0.05'],
+		[3, '태양과 함께, 은하 속으로', 'trail', 'galactic', '0.05'],
+		[4, '태양계의 다정한 동행', 'journey', 'galactic', '0.05'],
 		[5, '멀리까지 이어지는 발자취', 'trail', 'galactic', '1'],
 		[6, '지구는 꿈을 싣고', 'earth-journey', 'galactic', '0.05']
 	] as const) {
@@ -794,7 +794,7 @@ test('opening and final Earth views survive resize, follow motion and keep trans
 		path: `artifacts/orbit-story-surface/${info.project.name}-translucent-story.png`
 	});
 	await page.getByRole('button', { name: '다음 이야기', exact: true }).click();
-	await expect(canvas).toHaveAttribute('data-preset', 'journey');
+	await expect(canvas).toHaveAttribute('data-preset', 'trail');
 	await expectUncoveredSun(page);
 	await expectExtendedPaths(page);
 	// The final Earth stays central while its neighbourhood continues moving.
@@ -894,17 +894,57 @@ test('opening and final Earth views survive resize, follow motion and keep trans
 	await expect(canvas).toHaveAttribute('data-transitioning', 'false');
 });
 
-test('chapter two slows model motion while chapters three and four use distinct explanatory views', async ({
+test('chapter three reuses Galactic motion and chapter four preserves the former broadside journey', async ({
 	page
 }, info) => {
 	await page.goto('/orbit/');
 	const canvas = page.getByTestId('orbit-canvas');
 	await expect(page.getByTestId('orbit-explorer')).toHaveAttribute('data-status', 'ready');
+	await expect(canvas).toHaveAttribute('data-transitioning', 'false');
+	const direction = () =>
+		canvas.evaluate((element) => {
+			const data = (element as HTMLCanvasElement).dataset;
+			const target = data.target!.split(',').map(Number);
+			const offset = data.camera!.split(',').map((v, i) => Number(v) - target[i]);
+			const length = Math.hypot(...offset);
+			return offset.map((value) => value / length);
+		});
+	const galacticDirection = await direction();
+	const galacticRate = await canvas.getAttribute('data-years-per-second');
 	await page.getByRole('button', { name: '스토리', exact: true }).click();
 	await page.getByRole('button', { name: '다음 이야기', exact: true }).click();
 	await expect
 		.poll(async () => Number(await canvas.getAttribute('data-years-per-second')))
 		.toBeCloseTo(0.169 / 1.5, 8);
+	await page.getByRole('button', { name: '다음 이야기', exact: true }).click();
+	await expect(canvas).toHaveAttribute('data-preset', 'trail');
+	await expectUncoveredSun(page);
+	// Caption space reduces the available height; measure against the shorter scene edge,
+	// not the full window width used by the caption-free Galactic mode.
+	const trailSpan = await canvas.evaluate((element) => {
+		const data = (element as HTMLCanvasElement).dataset;
+		const [, , width, height] = data.framingArea!.split(',').map(Number);
+		const [sunX, sunY] = data.sunScreen!.split(',').map(Number);
+		const [pastX, pastY] = data.trailStartScreen!.split(',').map(Number);
+		return { x: sunX - pastX, y: sunY - pastY, edge: Math.min(width, height) };
+	});
+	expect(trailSpan.x).toBeGreaterThan(trailSpan.edge * 0.25);
+	expect(trailSpan.y).toBeGreaterThan(trailSpan.edge * 0.1);
+	await expect(canvas).toHaveAttribute('data-speed-factor', '0.05');
+	await expect(canvas).toHaveAttribute('data-years-per-second', galacticRate!);
+	(await direction()).forEach((value, axis) =>
+		expect(value).toBeCloseTo(galacticDirection[axis], 7)
+	);
+	const before = await canvas.getAttribute('data-earth-position');
+	await expect.poll(() => canvas.getAttribute('data-earth-position')).not.toBe(before);
+	await page.screenshot({
+		path: `artifacts/orbit-story-reorder/${info.project.name}-chapter3.png`
+	});
+	// A foreground planet can cross the disc; the explicit Sun name remains selectable.
+	await page.getByRole('button', { name: '태양 가까이 보기', exact: true }).focus();
+	await page.keyboard.press('Enter');
+	await expectPausedStory(page, '태양과 함께, 은하 속으로');
+	await expect(canvas).toHaveAttribute('data-preset', 'track-sun');
 	await page.getByRole('button', { name: '다음 이야기', exact: true }).click();
 	await expect(canvas).toHaveAttribute('data-preset', 'journey');
 	await expectUncoveredSun(page);
@@ -914,21 +954,9 @@ test('chapter two slows model motion while chapters three and four use distinct 
 		const [x, y, width, height] = data.framingArea!.split(',').map(Number);
 		const [sunX, sunY] = data.sunScreen!.split(',').map(Number);
 		const [pastX, pastY] = data.trailStartScreen!.split(',').map(Number);
-		const camera = data.camera!.split(',').map(Number);
-		const target = data.target!.split(',').map(Number);
-		return {
-			sunX,
-			sunY,
-			pastX,
-			pastY,
-			x,
-			y,
-			width,
-			height,
-			distance: Math.hypot(...camera.map((v, i) => v - target[i]))
-		};
+		return { sunX, sunY, pastX, pastY, x, y, width, height };
 	});
-	// Both desktop and portrait mobile show the same broadside, almost horizontal journey.
+	// Chapter 4 now inherits the former chapter-3 broadside framing and mobile inset.
 	expect(composition.sunX).toBeGreaterThan(composition.x + composition.width * 0.55);
 	if (info.project.name === 'mobile')
 		expect(composition.sunX).toBeLessThan(composition.x + composition.width * 0.75);
@@ -936,56 +964,19 @@ test('chapter two slows model motion while chapters three and four use distinct 
 	expect(Math.abs(composition.sunY - composition.pastY)).toBeLessThan(
 		(composition.sunX - composition.pastX) * 0.2
 	);
+	const journeyDirection = await direction();
+	expect(
+		Math.hypot(...journeyDirection.map((value, axis) => value - galacticDirection[axis]))
+	).toBeGreaterThan(0.5);
 	await page.screenshot({
-		path: `artifacts/orbit-chapter3-inset/${info.project.name}-chapter3.png`
+		path: `artifacts/orbit-story-reorder/${info.project.name}-chapter4.png`
 	});
-	// A foreground planet can cross the solar disc; the explicit Sun name remains selectable.
-	await page.getByRole('button', { name: '태양 가까이 보기', exact: true }).focus();
-	await page.keyboard.press('Enter');
-	await expectPausedStory(page, '태양과 함께, 은하 속으로');
-	await expect(canvas).toHaveAttribute('data-preset', 'track-sun');
-	await page.getByRole('button', { name: '태양계', exact: true }).click();
-	await page.getByRole('button', { name: '스토리', exact: true }).click();
-	await page.getByRole('button', { name: '다음 이야기', exact: true }).click();
-	await expect
-		.poll(async () => Number(await canvas.getAttribute('data-years-per-second')))
-		.toBeCloseTo(0.169 / 1.5, 8);
-	await page.getByRole('button', { name: '다음 이야기', exact: true }).click();
-	await page.getByRole('button', { name: '다음 이야기', exact: true }).click();
-	await expect(canvas).toHaveAttribute('data-preset', 'formation');
+	await page.getByRole('button', { name: '이전 이야기', exact: true }).click();
+	await expect(canvas).toHaveAttribute('data-preset', 'trail');
 	await expectUncoveredSun(page);
-	const formation = await canvas.evaluate((element) => {
-		const data = (element as HTMLCanvasElement).dataset;
-		const [x, , width] = data.framingArea!.split(',').map(Number);
-		const [sunX, sunY] = data.sunScreen!.split(',').map(Number);
-		const [pastX, pastY] = data.trailStartScreen!.split(',').map(Number);
-		return {
-			x,
-			width,
-			sunX,
-			sunY,
-			pastX,
-			pastY,
-			distance: Math.hypot(...data.camera!.split(',').map(Number))
-		};
-	});
-	expect(formation.sunX).toBeCloseTo(
-		formation.x +
-			(info.project.name === 'mobile' ? formation.width * 0.62 + 10 : formation.width * 0.5),
-		0
-	);
-	expect(formation.sunX).toBeGreaterThan(formation.pastX);
-	if (info.project.name === 'mobile') {
-		expect(formation.sunX - formation.pastX).toBeGreaterThan(formation.width * 0.35);
-		expect(formation.sunX - formation.pastX).toBeLessThan(formation.width * 0.55);
-	}
-	expect(Math.abs(formation.sunY - formation.pastY)).toBeLessThan(2);
-	expect(formation.distance).toBeLessThan(composition.distance * 0.85);
-	await page.screenshot({
-		path: `artifacts/orbit-chapter4-refine/${info.project.name}-chapter4.png`
-	});
-	await page.getByRole('button', { name: '태양계', exact: true }).click();
-	await expect(canvas).toHaveAttribute('data-years-per-second', '0.169');
+	await page.getByRole('button', { name: '은하 궤적', exact: true }).click();
+	await expectGalacticComposition(page);
+	await expect(canvas).toHaveAttribute('data-years-per-second', galacticRate!);
 });
 
 test('story framing adapts to tablet, landscape, chapter height and enlarged text', async ({
@@ -1007,12 +998,15 @@ test('story framing adapts to tablet, landscape, chapter height and enlarged tex
 				const data = (element as HTMLCanvasElement).dataset;
 				return {
 					area: data.framingArea!.split(',').map(Number),
-					sun: data.sunScreen!.split(',').map(Number)
+					sun: data.sunScreen!.split(',').map(Number),
+					past: data.trailStartScreen!.split(',').map(Number)
 				};
 			});
-			expect(framing.sun[0]).toBeCloseTo(framing.area[0] + framing.area[2] * 0.62 + 10, 0);
+			expect(Math.abs(framing.sun[1] - framing.past[1])).toBeLessThan(
+				(framing.sun[0] - framing.past[0]) * 0.2
+			);
 			await page.screenshot({
-				path: `artifacts/orbit-chapter4-refine/${info.project.name}-responsive-chapter4.png`
+				path: `artifacts/orbit-story-reorder/${info.project.name}-responsive-chapter4.png`
 			});
 		}
 		if (chapter === 5) {
@@ -1055,19 +1049,19 @@ test('story framing adapts to tablet, landscape, chapter height and enlarged tex
 		path: `artifacts/orbit-story-layout/${info.project.name}-large-story-text.png`,
 		fullPage: true
 	});
-	// The shared chapter-3 angle must still fit when the portrait caption grows.
-	await page.getByRole('button', { name: '이전 이야기', exact: true }).click();
-	await expect(canvas).toHaveAttribute('data-preset', 'formation');
-	await expectUncoveredSun(page);
-	await page.screenshot({
-		path: `artifacts/orbit-chapter4-refine/${info.project.name}-large-story-text.png`,
-		fullPage: true
-	});
+	// Both reassigned views must still fit when the portrait caption grows.
 	await page.getByRole('button', { name: '이전 이야기', exact: true }).click();
 	await expect(canvas).toHaveAttribute('data-preset', 'journey');
 	await expectUncoveredSun(page);
 	await page.screenshot({
-		path: `artifacts/orbit-chapter3-inset/${info.project.name}-large-story-text.png`,
+		path: `artifacts/orbit-story-reorder/${info.project.name}-chapter4-large-text.png`,
+		fullPage: true
+	});
+	await page.getByRole('button', { name: '이전 이야기', exact: true }).click();
+	await expect(canvas).toHaveAttribute('data-preset', 'trail');
+	await expectUncoveredSun(page);
+	await page.screenshot({
+		path: `artifacts/orbit-story-reorder/${info.project.name}-chapter3-large-text.png`,
 		fullPage: true
 	});
 	expect(
@@ -1312,7 +1306,7 @@ test('free story camera pauses the chapter, preserves its scene and resumes prog
 	await page.getByRole('button', { name: '다음 이야기', exact: true }).click();
 	await page.getByRole('button', { name: '다음 이야기', exact: true }).click();
 	await story.click();
-	await expect(canvas).toHaveAttribute('data-preset', 'journey');
+	await expect(canvas).toHaveAttribute('data-preset', 'trail');
 	const originalCamera = await canvas.getAttribute('data-camera');
 	await dragScene();
 	await expectPausedStory(page, '태양과 함께, 은하 속으로');

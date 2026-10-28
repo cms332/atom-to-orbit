@@ -20,7 +20,7 @@ test('article format and source disclosures are consistent across all articles',
 			1
 		);
 		await expect(page.locator('article summary')).toHaveCount(
-			['moon', 'starlight'].includes(article.diagram) ? 2 : 3
+			article.diagram === 'sky-colors' ? 4 : ['moon', 'starlight'].includes(article.diagram) ? 2 : 3
 		);
 		for (const selector of [
 			'.article-header',

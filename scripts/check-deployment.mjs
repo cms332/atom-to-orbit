@@ -29,7 +29,8 @@ for (const route of [
 	'/robots.txt',
 	'/sitemap.xml',
 	'/fonts/OFL.txt',
-	'/licenses/orbit-textures.txt'
+	'/licenses/orbit-textures.txt',
+	'/licenses/canvas-confetti-ISC.txt'
 ]) {
 	const response = await fetch(origin + route);
 	assert.equal(response.status, 200, route);
@@ -274,18 +275,43 @@ try {
 			.getByRole('button', { name: /B 빛이/ })
 			.click();
 		await expect(page.locator('.sky-quiz [role="status"]')).toContainText('맞아요');
+		const confetti = page.getByTestId('quiz-confetti');
+		await expect(confetti).toBeVisible();
+		await expect
+			.poll(() =>
+				confetti.evaluate((element) => {
+					const canvas = element;
+					const pixels = canvas
+						.getContext('2d')
+						.getImageData(0, 0, canvas.width, canvas.height).data;
+					let visible = 0;
+					for (let i = 3; i < pixels.length; i += 4) if (pixels[i] > 100) visible++;
+					return visible;
+				})
+			)
+			.toBeGreaterThan(500);
+		await page.locator('.sky-quiz').screenshot({ path: `${folder}/${width}-quiz-confetti.png` });
+		await page.locator('.sky-quiz').getByRole('button', { name: '다시 풀기', exact: true }).click();
+		await expect(confetti).toHaveCount(0);
 		await page.goto(`${origin}/articles/how-old-is-starlight/`);
 		await expect(page.locator('h1')).toHaveText('우리가 보는 별빛은 얼마나 오래전의 빛일까?');
 		const light = page.getByTestId('light-travel');
 		await expect(page.locator('.light-table tbody tr')).toHaveCount(5);
 		await expect(light).toHaveAttribute('data-progress', '0');
+		await expect(light).toContainText('10초');
+		await expect(light.getByRole('button', { name: '도착 모습만 보기', exact: true })).toHaveCount(
+			0
+		);
 		for (const name of ['달', '태양', '프록시마 센타우리', '시리우스', '안드로메다은하']) {
 			await light.getByRole('button', { name, exact: true }).click();
-			await light.getByRole('button', { name: '빛의 길 따라가기' }).click();
+			await light.getByRole('slider').press('End');
 			await expect(light).toHaveAttribute('data-progress', '1');
-			await expect(light.getByTestId('light-arrival')).toContainText('전의 소식입니다');
+			await expect(light.getByTestId('light-arrival')).toContainText('출발했어요');
 		}
 		await light.getByRole('button', { name: '시리우스', exact: true }).click();
+		await light.getByRole('slider').fill('50');
+		await expect(light.locator('.elapsed-reading')).toContainText('4.3');
+		await light.getByRole('button', { name: '처음부터', exact: true }).click();
 		await page.emulateMedia({ reducedMotion: 'no-preference' });
 		await light.getByRole('button', { name: '빛의 길 따라가기' }).click();
 		await expect
@@ -296,7 +322,7 @@ try {
 		await page.waitForTimeout(250);
 		await expect(light).toHaveAttribute('data-progress', lightPaused);
 		await light.getByRole('button', { name: '빛의 길 따라가기' }).click();
-		await expect(light).toHaveAttribute('data-progress', '1');
+		await expect(light).toHaveAttribute('data-progress', '1', { timeout: 15_000 });
 		await light.screenshot({ path: `${folder}/${width}-starlight.png` });
 		await page
 			.locator('.starlight-quiz')
@@ -333,7 +359,11 @@ try {
 		await story.click();
 		for (let chapter = 2; chapter <= 6; chapter++) {
 			await page.getByRole('button', { name: '다음 이야기', exact: true }).click();
-			if (chapter < 4) continue;
+			if (chapter < 3) continue;
+			if (chapter === 3 || chapter === 4) {
+				await expect(canvas).toHaveAttribute('data-preset', chapter === 3 ? 'trail' : 'journey');
+				await expect(canvas).toHaveAttribute('data-speed-factor', '0.05');
+			}
 			await expect(canvas).toHaveAttribute('data-transitioning', 'false');
 			await page.screenshot({ path: `${folder}/${width}-chapter${chapter}.png` });
 		}

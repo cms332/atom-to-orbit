@@ -4,7 +4,7 @@ import type { ScienceSource } from './science';
 export const LIGHT_SPEED_M_S = lightSpeed.metersPerSecond;
 export const JULIAN_YEAR_SECONDS = 365.25 * 86_400;
 export const LIGHT_YEAR_M = LIGHT_SPEED_M_S * JULIAN_YEAR_SECONDS;
-export const LIGHT_ANIMATION_MS = 3_000;
+export const LIGHT_ANIMATION_MS = 10_000;
 
 export interface LightTarget {
 	id: string;
@@ -26,7 +26,7 @@ export const lightTargets: readonly LightTarget[] = [
 		distanceM: 384_400_000,
 		distanceLabel: '약 38만 4,400km',
 		timeLabel: '약 1.3초',
-		note: '달에서 반사된 태양빛이 지구로 오는 시간이에요. 태양에서 달까지 온 시간은 따로 있어요.',
+		note: '1.3초는 태양빛이 달에서 반사된 뒤 지구까지 오는 시간이에요.',
 		sourceIds: ['starlight-moon', 'starlight-moonlight']
 	},
 	{
@@ -56,7 +56,7 @@ export const lightTargets: readonly LightTarget[] = [
 		distanceM: 8.6 * LIGHT_YEAR_M,
 		distanceLabel: '약 8.6광년',
 		timeLabel: '약 8.6년',
-		note: '지금 열 살인 어린이가 본다면, 한 살쯤이었을 때 출발한 빛을 만나는 셈이에요.',
+		note: '약 8년 7개월의 여행이에요. 열 번째 생일에 본다면, 한 살 조금 넘었을 때 출발한 빛을 만나는 셈이지요.',
 		sourceIds: ['starlight-sirius']
 	},
 	{
@@ -66,7 +66,7 @@ export const lightTargets: readonly LightTarget[] = [
 		distanceM: 2_500_000 * LIGHT_YEAR_M,
 		distanceLabel: '약 250만 광년',
 		timeLabel: '약 250만 년',
-		note: '별 하나가 아니라 수많은 별이 모인 은하예요. 우리 가족의 기억보다 훨씬 오래된 빛이지요.',
+		note: '별 하나가 아니라 수많은 별이 모인 은하예요. 지금 도착한 빛은 약 250만 년 전의 모습을 보여줘요.',
 		sourceIds: ['starlight-andromeda']
 	}
 ];
@@ -76,6 +76,11 @@ export function clampLightProgress(value: number): number {
 }
 export function lightTravelSeconds(target: LightTarget, progress = 1): number {
 	return (target.distanceM / LIGHT_SPEED_M_S) * clampLightProgress(progress);
+}
+export function lightArrivalLabel(target: LightTarget): string {
+	return target.id === 'moon'
+		? `이 빛은 ${target.timeLabel} 전에 달에서 반사되어 출발했어요.`
+		: `이 빛은 ${target.timeLabel} 전에 ${target.name}에서 출발했어요.`;
 }
 export function lightElapsedLabel(target: LightTarget, progress: number): string {
 	const seconds = lightTravelSeconds(target, progress);
@@ -90,6 +95,33 @@ export function lightElapsedLabel(target: LightTarget, progress: number): string
 		return `${Math.floor(rounded / 60)}분 ${rounded % 60}초`;
 	}
 	return `${seconds.toFixed(1)}초`;
+}
+
+// The moving readout uses rounded, child-readable values, never as model input.
+// Round sunlight to ten seconds so the endpoint agrees with the 8m 20s headline.
+export function lightElapsedParts(target: LightTarget, progress: number) {
+	const seconds = lightTravelSeconds(target, progress);
+	if (target.id === 'sun') {
+		const rounded = Math.round(seconds / 10) * 10;
+		return {
+			value: `${Math.floor(rounded / 60)}분 ${String(rounded % 60).padStart(2, '0')}`,
+			unit: '초',
+			widthCh: 6
+		};
+	}
+	if (target.distanceM >= LIGHT_YEAR_M) {
+		const years = seconds / JULIAN_YEAR_SECONDS;
+		// Choose the unit from the whole journey, not the current sample.
+		return target.distanceM >= 10_000 * LIGHT_YEAR_M
+			? { value: (years / 10_000).toFixed(1), unit: '만 년', widthCh: 5 }
+			: { value: years.toFixed(1), unit: '년', widthCh: 3 };
+	}
+	return { value: seconds.toFixed(1), unit: '초', widthCh: 3 };
+}
+
+export function lightElapsedReading(target: LightTarget, progress: number): string {
+	const { value, unit } = lightElapsedParts(target, progress);
+	return `약 ${value}${unit}`;
 }
 
 export const starlightSources: ScienceSource[] = [
@@ -151,7 +183,7 @@ export const starlightSources: ScienceSource[] = [
 		label: 'NASA Hubble · The Dog Star, Sirius, and its Tiny Companion',
 		url: 'https://science.nasa.gov/asset/hubble/the-dog-star-sirius-and-its-tiny-companion/',
 		basis:
-			'시리우스 A의 대표 거리 약 8.6광년. 열 살에서 8.6년을 빼면 약 1.4살이며, 본문은 한 살쯤이라고 표현했습니다.'
+			'시리우스 A의 대표 거리 약 8.6광년. 열 번째 생일에서 8.6년을 빼면 약 1.4살이므로 한 살 조금 넘었을 때로 표현합니다. 0.6년은 약 7개월입니다.'
 	},
 	{
 		id: 'starlight-andromeda',
