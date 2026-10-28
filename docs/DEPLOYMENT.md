@@ -200,3 +200,16 @@ NPM 내부 모듈 API는 현재 설치 버전에서 검증한다. NPM 업그레�
   웹 콘텐츠는 재배포하지 않으며 공개 빌드 소스는 `646716706de1aaa8c8eabb7a9ca42bd14f7f0775`를 유지한다.
 - 로컬 증거: `artifacts/container-cleanup/a2o.json`, `hgi-preview.json`, `http-checks.json`.
   서버 상태 폴더에도 실제 삭제 ID와 결과를 기록하며, 원본·자격 증명은 공개하지 않는다.
+
+## 별빛의 나이 기사 공개 배포 — 2026-10-28 (KST)
+
+- 승인 범위: 새 별빛 기사의 개발·GitHub 공개·검증 후 배포. PR #10의 검증 완료 후 main에 병합했다.
+- 실제 배포 소스: `2c31b16a144af2b7ff9e2e3943928fa4083395c1`.
+- 해당 소스의 main CI: `40634550305` 성공. 타입·서식·64개 단위 검사·9개 컨테이너 정리 안전 검사·빌드·78개 브라우저 검사 통과.
+- 릴리스: `20261028T045511Z`. 패키지 SHA-256: `cdc8c5873f4422a6aaa90a254b661d9838f0fe47cdde0e47fecbdc46dc92e4eb`.
+- 빌드 시각: `2026-10-28T04:55:47.140Z` (13:55:47.140 KST). 공개 `/build-info.json`에서 소스·릴리스·해시를 대조했다.
+- 새 URL: <https://a2o.kr/articles/how-old-is-starlight/>. 총 13개 HTTP 경로와 PC 1440px·모바일 360px 공개 브라우저 검증 통과. 새 5개 천체 선택·재생·정지·이어보기·도착·퀴즈, 다섯 기사의 메타데이터/출처와 기존 탐험기를 확인했다. 페이지 오류와 실패한 자원 요청 0개. 실제 공개 캡처를 확인했으며 모바일은 Chromium 터치 에뮬레이션이다.
+- 기존 JS 주소 35개와 네이버 확인 파일 원본 바이트를 보존했다. 기존 컨테이너 22개와 타 서비스 프록시 설정 6개는 변경하지 않았다. HGI preview·Umami·PostgreSQL·DNS 변경 없음.
+- 이전 A2O 컨테이너 `a2o-20261022T205611Z`를 안전 정리했고 `a2o-20261028T045511Z`만 정상 실행 중이다. HGI preview도 기존 최신 1개를 유지한다.
+- GitHub production Deployment `7377535606`은 공개 검증 후 success로 기록했다. `deployed-20261028T045511Z` 태그는 실제 배포 소스를 가리킨다. 후속 문서 기록 커밋은 별도이며 실제 배포 SHA를 소급 변경하지 않는다.
+- 증거: `artifacts/starlight-deployment/` 아래 `source-ci.json`, `source-ci.log`, `metadata-and-assets.json`, `server-audit-summary.json`, `github-deployment-success.json`, `public-20261028T045511Z/verification.json` 및 PC·모바일 캡처. 비공개 서버 감사 원본과 접근 자격 증명은 공개 저장소에 넣지 않는다.
