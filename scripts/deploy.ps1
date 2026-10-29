@@ -13,7 +13,7 @@ if ($Action -eq 'deploy') {
   Assert-Success
   scp @scpOptions $release.archive "${target}:a2o/uploads/$($release.release).tar.gz"
   Assert-Success
-  scp @scpOptions deploy/release.sh deploy/bootstrap.py deploy/npm-a2o.mjs deploy/prune-containers.py "${target}:a2o/"
+  scp @scpOptions deploy/release.sh deploy/bootstrap.py deploy/npm-a2o.mjs deploy/canonical-redirects.mjs deploy/prune-containers.py "${target}:a2o/"
   Assert-Success
   ssh @sshOptions $target "bash ~/a2o/release.sh deploy $($release.release)"
   Assert-Success
