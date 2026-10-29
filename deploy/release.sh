@@ -8,7 +8,10 @@ exec 9>"$ROOT/state/deploy.lock"
 flock -n 9 || { echo 'Another A2O deployment is running'; exit 1; }
 action="${1:-}"
 release="${2:-}"
-proxy() { docker exec -i -w /app npm node --input-type=module - "$@" < "$ROOT/npm-a2o.mjs"; }
+proxy() {
+  docker exec -i npm sh -c 'cat > /tmp/a2o-canonical-redirects.mjs' < "$ROOT/canonical-redirects.mjs"
+  docker exec -i -w /app npm node --input-type=module - "$@" < "$ROOT/npm-a2o.mjs"
+}
 healthy() {
   for attempt in $(seq 1 40); do
     state=$(docker inspect --format '{{.State.Health.Status}}' "$1" 2>/dev/null || true)

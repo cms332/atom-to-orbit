@@ -1,4 +1,5 @@
 // Runs through SSH stdin inside the existing NPM container. Scope: A2O hosts only.
+import { canonicalRedirects, CANONICAL_MARKER } from '/tmp/a2o-canonical-redirects.mjs';
 import { readFile, readdir } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
 import { resolve4 } from 'node:dns/promises';
@@ -12,6 +13,14 @@ import certificates from '/app/models/certificate.js';
 const domains = ['a2o.kr', 'www.a2o.kr'];
 const action = process.argv[2];
 let host;
+async function canonicalSettings(target, previous) {
+	const response = await fetch(`http://${target}:8080/sitemap.xml`);
+	if (!response.ok) throw new Error('Candidate sitemap unavailable');
+	return {
+		ssl_forced: false,
+		advanced_config: canonicalRedirects(await response.text(), previous)
+	};
+}
 async function otherConfigs() {
 	const result = {};
 	for (const file of (await readdir('/data/nginx/proxy_host')).sort()) {
@@ -65,7 +74,8 @@ try {
 				id: host.id,
 				domain_names: domains,
 				forward_host: target,
-				forward_port: 8080
+				forward_port: 8080,
+				...(await canonicalSettings(target, host.advanced_config))
 			});
 		else
 			host = await proxy.create(access, {
@@ -83,7 +93,7 @@ try {
 				hsts_enabled: false,
 				hsts_subdomains: false,
 				locations: [],
-				advanced_config: '',
+				...(await canonicalSettings(target, '')),
 				meta: {}
 			});
 	} else if (action === 'tls') {
@@ -105,7 +115,7 @@ try {
 		await proxy.update(access, {
 			id: host.id,
 			certificate_id: certificate.id,
-			ssl_forced: true,
+			...(await canonicalSettings(host.forward_host, host.advanced_config)),
 			http2_support: true
 		});
 	} else if (action !== 'status') throw new Error('Unknown A2O action');
@@ -123,7 +133,9 @@ try {
 				target: current.forward_host,
 				port: current.forward_port,
 				certificate: current.certificate_id,
-				https: current.ssl_forced,
+				https:
+					!!current.certificate_id &&
+					(current.ssl_forced || current.advanced_config?.startsWith(CANONICAL_MARKER)),
 				online: current.meta?.nginx_online
 			}
 		)
