@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { Article } from '$lib/content/articles';
+	import MoonOrbitPanel from './MoonOrbitPanel.svelte';
 	import Diagram from './Diagram.svelte';
 	import MotionThumbnail from './MotionThumbnail.svelte';
 	import AtomicSpaceThumbnail from './AtomicSpaceThumbnail.svelte';
@@ -14,7 +15,9 @@
 		aria-labelledby={`article-title-${article.slug}`}
 		aria-describedby={`article-intro-${article.slug}`}
 		><div class="article-art">
-			{#if article.diagram === 'sky-colors'}<SkyColorThumbnail
+			{#if article.diagram === 'moon-face'}<MoonOrbitPanel
+					turn={0.42}
+				/>{:else if article.diagram === 'sky-colors'}<SkyColorThumbnail
 				/>{:else if article.diagram === 'starlight'}<StarlightThumbnail
 				/>{:else if article.diagram === 'atomic-space'}<AtomicSpaceThumbnail
 				/>{:else if article.diagram === 'motion'}<MotionThumbnail

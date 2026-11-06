@@ -13,6 +13,7 @@ assert.match(info.release, /^\d{8}T\d{6}Z$/);
 if (process.env.A2O_EXPECTED_COMMIT) assert.equal(info.commit, process.env.A2O_EXPECTED_COMMIT);
 const responses = [];
 const articleSources = [
+	['why-moon-shows-same-face', 3],
 	['why-sky-blue-sunset-red', 9],
 	['how-old-is-starlight', 11],
 	['why-earth-feels-still', 13],

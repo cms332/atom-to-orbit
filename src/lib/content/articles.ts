@@ -1,3 +1,4 @@
+import { moonFaceArticle } from './moon-face-article';
 import { motionArticle } from './motion-article';
 import { atomicSpaceArticle } from './atomic-space-article';
 import { atomicScaleArticle } from './atomic-scale-article';
@@ -13,7 +14,7 @@ export interface Article {
 	intro: string;
 	date?: string;
 	sourceIds: string[];
-	diagram: 'moon' | 'atom' | 'motion' | 'atomic-space' | 'starlight' | 'sky-colors';
+	diagram: 'moon' | 'atom' | 'motion' | 'atomic-space' | 'starlight' | 'sky-colors' | 'moon-face';
 	opening?: string[];
 	sourceNote?: string;
 	closing?: { title: string; paragraphs: string[]; keyPoint?: string };
@@ -37,11 +38,14 @@ export interface Article {
 			| 'atom-ball-moon'
 			| 'earth-moon-distance'
 			| 'earth-moon-balls'
-			| 'log-steps';
+			| 'log-steps'
+			| 'moon-rotation'
+			| 'moon-lighting';
 	}[];
 	takeaway: string;
 }
 export const articles: Article[] = [
+	moonFaceArticle,
 	skyColorsArticle,
 	starlightArticle,
 	atomicSpaceArticle,
