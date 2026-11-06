@@ -7,12 +7,12 @@ test('orbital logo loads, fits the header and retains keyboard home navigation',
 	const errors: string[] = [];
 	page.on('pageerror', (error) => errors.push(error.message));
 	await page.goto('/');
-	await page.evaluate(async () => {
-		await document.fonts.ready;
-		const logo = new Image();
-		logo.src = '/brand/a2o-orbital.png';
-		await logo.decode();
-	});
+	await page.evaluate(() => document.fonts.ready);
+	for (const selector of ['.brand-logo', '.footer-logo img']) {
+		const logo = page.locator(selector);
+		await expect(logo).toHaveAttribute('src', '/brand/a2o-orbital.svg');
+		await logo.evaluate((element: HTMLImageElement) => element.decode());
+	}
 	const home = page.getByRole('link', { name: 'A2O — Atom to Orbit, 홈', exact: true });
 	const widths = isMobile ? [390, 320] : [1440, 1014, 768];
 	for (const width of widths) {

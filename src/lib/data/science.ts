@@ -1,3 +1,4 @@
+import { moonFaceSources } from '../content/moon-face-article';
 import { additionalObjects, additionalSources } from './science-expansion';
 import { planetObjects, planetSources } from './science-planets';
 import { motionSources } from './motion';
@@ -33,6 +34,7 @@ export interface ScaleObject {
 }
 const nasa = 'https://nssdc.gsfc.nasa.gov/planetary/factsheet/';
 export const sources: ScienceSource[] = [
+	...moonFaceSources,
 	...skySources,
 	{
 		id: 'nist',

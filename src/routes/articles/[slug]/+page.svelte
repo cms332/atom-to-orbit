@@ -1,4 +1,7 @@
 <script lang="ts">
+	import MoonRotationExplorer from '$lib/components/MoonRotationExplorer.svelte';
+	import MoonLighting from '$lib/components/MoonLighting.svelte';
+	import MoonQuiz from '$lib/components/MoonQuiz.svelte';
 	import PageMeta from '$lib/components/PageMeta.svelte';
 	import MoonDistance from '$lib/components/MoonDistance.svelte';
 	import MotionSpeeds from '$lib/components/MotionSpeeds.svelte';
@@ -131,6 +134,8 @@
 									>[{article.sourceIds.indexOf(id) + 1}]</a
 								>{/each}
 						</div>{/if}
+					{#if section.visual === 'moon-rotation'}<MoonRotationExplorer />{/if}
+					{#if section.visual === 'moon-lighting'}<MoonLighting />{/if}
 					{#if section.visual === 'light-travel'}<LightTravelExplorer />{/if}
 					{#if section.visual === 'sky-colors'}<SkyColorExplorer />{/if}
 					{#if section.visual === 'sky-comparison'}<SkyComparison />{/if}
@@ -150,6 +155,7 @@
 					{#each article.closing.paragraphs as paragraph (paragraph)}<p>{paragraph}</p>{/each}
 					{#if article.closing.keyPoint}<p class="key-point">{article.closing.keyPoint}</p>{/if}
 				</section>{/if}
+			{#if article.diagram === 'moon-face'}<MoonQuiz />{/if}
 			{#if article.diagram === 'starlight'}<StarlightQuiz />{/if}
 			{#if article.diagram === 'sky-colors'}
 				<p class="note">
@@ -170,7 +176,12 @@
 			{/if}
 			<aside class="explorer-invitation">
 				<h2>직접 탐험해 보세요.</h2>
-				{#if article.diagram === 'sky-colors'}
+				{#if article.diagram === 'moon-face'}<p>
+						달이 한 바퀴 도는 길은 얼마나 클까요? 지구와 달 사이의 거리를 같은 눈금으로 살펴보세요.
+					</p>
+					<a class="primary" href="/articles/earth-moon/">지구와 달 사이 거리 보기 ↗</a>
+					<p><a href="/articles/how-old-is-starlight/">달빛이 지구에 오는 시간도 알아보세요.</a></p>
+				{:else if article.diagram === 'sky-colors'}
 					<p>
 						지구의 공기를 만나기 전, 빛은 얼마나 긴 여행을 했을까요? 달빛부터 멀리 있는 은하의
 						빛까지 따라가 보세요.

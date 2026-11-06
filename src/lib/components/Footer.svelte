@@ -37,15 +37,7 @@
 		<div class="footer-top">
 			<div>
 				<a class="footer-logo" href="/" translate="no" aria-label="A2O 홈"
-					><svg
-						width="112"
-						height="36.378"
-						viewBox="124 373 1250 406"
-						aria-hidden="true"
-						focusable="false"
-					>
-						<image href="/brand/a2o-orbital.png" width="1448" height="1086" />
-					</svg></a
+					><img src="/brand/a2o-orbital.svg" width="1250" height="406" alt="" /></a
 				>
 				<p class="footer-sub">ATOM TO ORBIT — INDEPENDENT SCIENCE ATLAS</p>
 			</div>
@@ -97,7 +89,7 @@
 		min-height: 44px;
 		text-decoration: none;
 	}
-	.footer-logo svg {
+	.footer-logo img {
 		display: block;
 		width: 112px;
 		height: auto;
@@ -167,7 +159,7 @@
 			sans-serif;
 	}
 	@media (max-width: 767px) {
-		.footer-logo svg {
+		.footer-logo img {
 			width: 92px;
 		}
 		.footer-top {

@@ -22,17 +22,13 @@
 <header id="page-top" tabindex="-1">
 	<div class="wrap header-inner">
 		<a class="wordmark" href="/" translate="no" aria-label="A2O — Atom to Orbit, 홈"
-			><svg
+			><img
 				class="brand-logo"
-				width="112"
-				height="36.378"
-				viewBox="124 373 1250 406"
-				aria-hidden="true"
-				focusable="false"
-			>
-				<!-- Frame the supplied transparent PNG without altering its artwork. -->
-				<image href="/brand/a2o-orbital.png" width="1448" height="1086" />
-			</svg><small>ATOM<br />TO ORBIT</small></a
+				src="/brand/a2o-orbital.svg"
+				width="1250"
+				height="406"
+				alt=""
+			/><small>ATOM<br />TO ORBIT</small></a
 		>
 		<nav aria-label="주요 탐색">
 			{#each links as [href, label] (href)}<a

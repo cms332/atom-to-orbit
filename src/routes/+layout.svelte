@@ -4,6 +4,11 @@
 	import Footer from '$lib/components/Footer.svelte';
 	import Analytics from '$lib/components/Analytics.svelte';
 	import { page } from '$app/state';
+	const shareImage = $derived(
+		page.params.slug === 'why-moon-shows-same-face'
+			? 'https://a2o.kr/og-moon-face.png'
+			: 'https://a2o.kr/og-default.png'
+	);
 	let { children } = $props();
 </script>
 
@@ -14,10 +19,10 @@
 	/><meta property="og:locale" content="ko_KR" /><meta
 		property="og:type"
 		content={page.url.pathname.startsWith('/articles/') && page.params.slug ? 'article' : 'website'}
-	/><meta property="og:image" content="https://a2o.kr/og-default.png" /><link
-		rel="canonical"
-		href={`https://a2o.kr${page.url.pathname}`}
-	/></svelte:head
+	/><meta property="og:image" content={shareImage} /><meta
+		name="twitter:image"
+		content={shareImage}
+	/><link rel="canonical" href={`https://a2o.kr${page.url.pathname}`} /></svelte:head
 >
 <Header />
 <Analytics />
